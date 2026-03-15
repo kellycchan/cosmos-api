@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KC小宇宙</title>
+    <style>
+        :root {
+            --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        
+        /* 背景层 */
+        .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(18px) brightness(30%); transition: transform 0.3s ease-out; }
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 0.2) 0%, rgba(2, 2, 2, 0.6) 100%); }
+        
+        header { position: fixed; top: 0; left: 0; width: 100vw; height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 20; padding-top: 20px; }
+        h1 { font-size: 1.6rem; letter-spacing: 12px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; transition: text-shadow 0.5s; margin-bottom: 25px; }
+        
+        .sync-info { font-size: 0.5rem; color: #444; letter-spacing: 3px; text-transform: uppercase; display: flex; gap: 20px; transition: color 0.5s; }
+        .sync-active { color: var(--active-color, var(--color-0)); text-shadow: 0 0 10px var(--active-color, var(--color-0)); }
+        
+        .divider-line { width: 140px; height: 1px; background: rgba(255,255,255,0.05); margin-top: 12px; border-radius: 5px; transition: all 0.6s; }
+        .divider-active { width: 200px; background: linear-gradient(90deg, transparent 0%, var(--active-color, var(--color-0)) 50%, transparent 100%); box-shadow: 0 0 10px var(--active-color, var(--color-0)); }
+
+        .container { display: flex; height: 100vh; width: 100vw; padding: 20px; gap: 25px; align-items: center; justify-content: center; transform: translateY(40px); }
+        
+        /* 左侧导航 */
+        .side-nav { display: flex; flex-direction: column; width: 95px; gap: 12px; z-index: 10; }
+        .tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #666; width: 85px; height: 85px; font-size: 0.8rem; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.5s ease; border-radius: 20px; writing-mode: vertical-rl; letter-spacing: 4px; }
+        .tab-btn.active { color: #fff; transform: translateX(8px) scale(1.05); }
+        .tab-btn.active.btn-0 { border-color: var(--color-0); background: rgba(92, 156, 217, 0.1); }
+        .tab-btn.active.btn-1 { border-color: var(--color-1); background: rgba(125, 189, 189, 0.1); }
+        .tab-btn.active.btn-2 { border-color: var(--color-2); background: rgba(155, 132, 179, 0.1); }
+        .tab-btn.active.btn-3 { border-color: var(--color-3); background: rgba(209, 209, 209, 0.1); }
+
+        /* 右侧主窗体：增强 3D 效果 */
+        .main-content {
+            width: 280px; height: 430px; position: relative;
+            perspective: 800px; /* 较小的数值增加广角拉伸感 */
+            animation: cosmosRotate 10s infinite ease-in-out;
+        }
+
+        .display-screen {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(25px);
+            padding: 35px 25px;
+            height: 100%; width: 100%;
+            position: relative; overflow: hidden;
+            clip-path: polygon(10% 0%, 100% 8%, 100% 90%, 90% 100%, 0% 92%, 0% 12%);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.6s;
+        }
+
+        /* 内部光晕 */
+        .display-screen::before {
+            content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 10% 50%, var(--active-color, var(--color-0)) 0%, transparent 80%);
+            opacity: 0.25; z-index: 0; pointer-events: none; filter: blur(25px);
+        }
+
+        .content-panel { display: none; animation: softIn 0.8s ease; line-height: 2.2; font-size: 0.92rem; color: #ddd; position: relative; z-index: 1; }
+        .content-panel.active { display: block; }
+
+        @keyframes softIn { from { opacity: 0; transform: translateZ(50px); filter: blur(10px); } to { opacity: 1; transform: translateZ(0); filter: blur(0); } }
+        
+        /* 终极多维旋转动画 */
+        @keyframes cosmosRotate {
+            0% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+            25% { transform: translateY(-15px) rotateX(8deg) rotateY(-18deg) rotateZ(-1deg); }
+            50% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+            75% { transform: translateY(15px) rotateX(-8deg) rotateY(18deg) rotateZ(1deg); }
+            100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+        }
+
+        .highlight { color: var(--active-color, var(--color-2)); font-weight: bold; text-shadow: 0 0 10px var(--active-color); }
+        footer { position: absolute; bottom: -45px; right: 0; font-size: 0.5rem; opacity: 0.2; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay" id="background"></div>
+    <div class="space-bg"></div>
+    
+    <header>
+        <h1 id="title">KC小宇宙</h1>
+        <div class="sync-info" id="sync-info">
+            <span>DIM: 11D</span>
+            <span id="sync-status">STATUS: CONNECTING...</span>
+            <span>VECTOR: <span id="sync-time">--:--:--</span></span>
+        </div>
+        <div class="divider-line" id="divider"></div>
+    </header>
+
+    <div class="container">
+        <nav class="side-nav">
+            <div class="tab-btn btn-0 active" onclick="switchPanel(0)">诞生日</div>
+            <div class="tab-btn btn-1" onclick="switchPanel(1)">旋转燃料</div>
+            <div class="tab-btn btn-2" onclick="switchPanel(2)">照亮空间</div>
+            <div class="tab-btn btn-3" onclick="switchPanel(3)">终极进化</div>
+        </nav>
+        <main class="main-content">
+            <div class="display-screen" id="screen">
+                <div class="content-panel active" id="panel-0">> 正在同步远程节点...</div>
+                <div class="content-panel" id="panel-1">> 同步中...</div>
+                <div class="content-panel" id="panel-2">> 同步中...</div>
+                <div class="content-panel" id="panel-3">> 同步中...</div>
+            </div>
+            <footer>CORE // K_STATION_V10.0</footer>
+        </main>
+    </div>
+
+    <script>
+        // 【数据源配置】
+        // 使用时间戳 ?t= 强制刷新 GitHub 缓存
+        const DATA_URL = "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?t=" + new Date().getTime();
+        const colors = ['#5c9cd9', '#7dbdbd', '#9b84b3', '#d1d1d1'];
+
+        async function fetchCosmosData() {
+            try {
+                const response = await fetch(DATA_URL);
+                if (!response.ok) throw new Error('Network offline');
+                const data = await response.json();
+                
+                data.forEach((item, index) => {
+                    const panel = document.getElementById(`panel-${index}`);
+                    if (panel) panel.innerHTML = item.content;
+                });
+                
+                document.getElementById('sync-status').innerText = "STATUS: SYNC_STABLE";
+                console.log("数据已从远程维度同步。");
+            } catch (error) {
+                console.error("同步失败:", error);
+                document.getElementById('sync-status').innerText = "STATUS: LOCAL_CACHE";
+                document.getElementById('panel-0').innerText = "> 远程连接超时，已启用本地预设。";
+            }
+        }
+
+        function switchPanel(index) {
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach((btn, i) => btn.classList.toggle('active', i === index));
+            
+            const panels = document.querySelectorAll('.content-panel');
+            panels.forEach((panel, i) => panel.classList.toggle('active', i === index));
+            
+            const activeColor = colors[index];
+            document.documentElement.style.setProperty('--active-color', activeColor);
+            
+            const syncInfo = document.getElementById('sync-info');
+            const divider = document.getElementById('divider');
+            syncInfo.classList.remove('sync-active');
+            divider.classList.remove('divider-active');
+            void divider.offsetWidth; // 触发重绘
+            syncInfo.classList.add('sync-active');
+            divider.classList.add('divider-active');
+        }
+
+        function updateSyncTime() {
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const target = document.getElementById('sync-time');
+            if(target) target.innerText = timeStr;
+        }
+
+        window.onload = () => {
+            fetchCosmosData();
+            updateSyncTime();
+            setInterval(updateSyncTime, 1000);
+        };
+
+        // 背景微动效果
+        document.addEventListener('touchmove', (e) => {
+            const x = (e.touches[0].clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.touches[0].clientY / window.innerHeight - 0.5) * 20;
+            document.getElementById('background').style.transform = `translate(${x}px, ${y}px) scale(1.1)`;
+        });
+    </script>
+</body>
+</html>
