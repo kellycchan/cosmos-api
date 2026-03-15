@@ -35,10 +35,10 @@
         .tab-btn.active.btn-2 { border-color: var(--color-2); background: rgba(155, 132, 179, 0.1); }
         .tab-btn.active.btn-3 { border-color: var(--color-3); background: rgba(209, 209, 209, 0.1); }
 
-        /* 右侧主窗体：增强 3D 效果 */
+        /* 异形窗体 */
         .main-content {
             width: 280px; height: 430px; position: relative;
-            perspective: 800px; /* 较小的数值增加广角拉伸感 */
+            perspective: 800px;
             animation: cosmosRotate 10s infinite ease-in-out;
         }
 
@@ -53,7 +53,6 @@
             transition: all 0.6s;
         }
 
-        /* 内部光晕 */
         .display-screen::before {
             content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 100%;
             background: radial-gradient(circle at 10% 50%, var(--active-color, var(--color-0)) 0%, transparent 80%);
@@ -65,7 +64,6 @@
 
         @keyframes softIn { from { opacity: 0; transform: translateZ(50px); filter: blur(10px); } to { opacity: 1; transform: translateZ(0); filter: blur(0); } }
         
-        /* 终极多维旋转动画 */
         @keyframes cosmosRotate {
             0% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
             25% { transform: translateY(-15px) rotateX(8deg) rotateY(-18deg) rotateZ(-1deg); }
@@ -101,25 +99,24 @@
         </nav>
         <main class="main-content">
             <div class="display-screen" id="screen">
-                <div class="content-panel active" id="panel-0">> 正在同步远程节点...</div>
+                <div class="content-panel active" id="panel-0">> 正在同步节点...</div>
                 <div class="content-panel" id="panel-1">> 同步中...</div>
                 <div class="content-panel" id="panel-2">> 同步中...</div>
                 <div class="content-panel" id="panel-3">> 同步中...</div>
             </div>
-            <footer>CORE // K_STATION_V10.0</footer>
+            <footer>CORE // K_STATION_V10.1</footer>
         </main>
     </div>
 
     <script>
-        // 【数据源配置】
-        // 使用时间戳 ?t= 强制刷新 GitHub 缓存
-        const DATA_URL = "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?t=" + new Date().getTime();
+        // 【核心修改：采用相对路径，解决国内网络下 Raw 链接不通的问题】
+        const DATA_URL = "data.json?t=" + new Date().getTime();
         const colors = ['#5c9cd9', '#7dbdbd', '#9b84b3', '#d1d1d1'];
 
         async function fetchCosmosData() {
             try {
                 const response = await fetch(DATA_URL);
-                if (!response.ok) throw new Error('Network offline');
+                if (!response.ok) throw new Error('Offline');
                 const data = await response.json();
                 
                 data.forEach((item, index) => {
@@ -128,11 +125,9 @@
                 });
                 
                 document.getElementById('sync-status').innerText = "STATUS: SYNC_STABLE";
-                console.log("数据已从远程维度同步。");
             } catch (error) {
                 console.error("同步失败:", error);
-                document.getElementById('sync-status').innerText = "STATUS: LOCAL_CACHE";
-                document.getElementById('panel-0').innerText = "> 远程连接超时，已启用本地预设。";
+                document.getElementById('sync-status').innerText = "STATUS: LOCAL_MODE";
             }
         }
 
@@ -150,16 +145,14 @@
             const divider = document.getElementById('divider');
             syncInfo.classList.remove('sync-active');
             divider.classList.remove('divider-active');
-            void divider.offsetWidth; // 触发重绘
+            void divider.offsetWidth;
             syncInfo.classList.add('sync-active');
             divider.classList.add('divider-active');
         }
 
         function updateSyncTime() {
             const now = new Date();
-            const timeStr = now.toTimeString().split(' ')[0];
-            const target = document.getElementById('sync-time');
-            if(target) target.innerText = timeStr;
+            document.getElementById('sync-time').innerText = now.toTimeString().split(' ')[0];
         }
 
         window.onload = () => {
@@ -167,13 +160,6 @@
             updateSyncTime();
             setInterval(updateSyncTime, 1000);
         };
-
-        // 背景微动效果
-        document.addEventListener('touchmove', (e) => {
-            const x = (e.touches[0].clientX / window.innerWidth - 0.5) * 20;
-            const y = (e.touches[0].clientY / window.innerHeight - 0.5) * 20;
-            document.getElementById('background').style.transform = `translate(${x}px, ${y}px) scale(1.1)`;
-        });
     </script>
 </body>
 </html>
