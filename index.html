@@ -6,97 +6,105 @@
     <title>KC小宇宙</title>
     <style>
         :root {
-            --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1;
-            --active-color: #5c9cd9;
+            --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #000; 
-            color: #fff; 
-            font-family: sans-serif; 
-            overflow: hidden; 
-            height: 100vh; 
-            /* 备用动态背景：解决背景图丢失导致的“丑” */
-            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000 100%);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
         
-        header { 
-            position: fixed; top: 0; width: 100%; height: 120px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 10; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-        }
-        h1 { font-size: 1.4rem; letter-spacing: 10px; text-shadow: 0 0 15px var(--active-color); margin-bottom: 10px; }
-        .sync-info { font-size: 0.6rem; color: #666; display: flex; gap: 15px; text-transform: uppercase; }
+        /* 背景层 */
+        .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(18px) brightness(30%); transition: transform 0.3s ease-out; }
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 0.2) 0%, rgba(2, 2, 2, 0.6) 100%); }
+        
+        header { position: fixed; top: 0; left: 0; width: 100vw; height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 20; padding-top: 20px; }
+        h1 { font-size: 1.6rem; letter-spacing: 12px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; transition: text-shadow 0.5s; margin-bottom: 25px; }
+        
+        .sync-info { font-size: 0.5rem; color: #444; letter-spacing: 3px; text-transform: uppercase; display: flex; gap: 20px; transition: color 0.5s; }
+        .sync-active { color: var(--active-color, var(--color-0)); text-shadow: 0 0 10px var(--active-color, var(--color-0)); }
+        
+        .divider-line { width: 140px; height: 1px; background: rgba(255,255,255,0.05); margin-top: 12px; border-radius: 5px; transition: all 0.6s; }
+        .divider-active { width: 200px; background: linear-gradient(90deg, transparent 0%, var(--active-color, var(--color-0)) 50%, transparent 100%); box-shadow: 0 0 10px var(--active-color, var(--color-0)); }
 
-        .container { 
-            display: flex; height: 100vh; align-items: center; justify-content: center; 
-            gap: 15px; padding: 10px; padding-top: 60px;
-        }
+        .container { display: flex; height: 100vh; width: 100vw; padding: 20px; gap: 25px; align-items: center; justify-content: center; transform: translateY(40px); }
+        
+        /* 左侧导航 */
+        .side-nav { display: flex; flex-direction: column; width: 95px; gap: 12px; z-index: 10; }
+        .tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #666; width: 85px; height: 85px; font-size: 0.8rem; font-weight: bold; text-align: center; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.5s ease; border-radius: 20px; writing-mode: vertical-rl; letter-spacing: 4px; }
+        .tab-btn.active { color: #fff; transform: translateX(8px) scale(1.05); }
+        .tab-btn.active.btn-0 { border-color: var(--color-0); background: rgba(92, 156, 217, 0.1); }
+        .tab-btn.active.btn-1 { border-color: var(--color-1); background: rgba(125, 189, 189, 0.1); }
+        .tab-btn.active.btn-2 { border-color: var(--color-2); background: rgba(155, 132, 179, 0.1); }
+        .tab-btn.active.btn-3 { border-color: var(--color-3); background: rgba(209, 209, 209, 0.1); }
 
-        .side-nav { display: flex; flex-direction: column; gap: 10px; }
-        .tab-btn { 
-            width: 75px; height: 75px; background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px;
-            color: #555; display: flex; align-items: center; justify-content: center;
-            writing-mode: vertical-rl; font-size: 0.75rem; letter-spacing: 2px; transition: 0.4s;
-        }
-        .tab-btn.active { color: #fff; border-color: var(--active-color); background: rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--active-color); }
-
-        /* 核心窗体：加大尺寸，增强立体感 */
+        /* 异形窗体 */
         .main-content {
-            width: 75vw; max-width: 320px; height: 60vh; max-height: 500px;
-            perspective: 1200px; 
-            animation: cosmosRotate 12s infinite ease-in-out;
+            width: 280px; height: 430px; position: relative;
+            perspective: 800px;
+            animation: cosmosRotate 10s infinite ease-in-out;
         }
 
         .display-screen {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            padding: 30px 20px; height: 100%; width: 100%;
-            border: 1px solid rgba(255,255,255,0.15);
-            clip-path: polygon(12% 0%, 100% 5%, 100% 92%, 88% 100%, 0% 95%, 0% 8%);
-            display: flex; flex-direction: column; justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(25px);
+            padding: 35px 25px;
+            height: 100%; width: 100%;
+            position: relative; overflow: hidden;
+            clip-path: polygon(10% 0%, 100% 8%, 100% 90%, 90% 100%, 0% 92%, 0% 12%);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.6s;
         }
 
-        .content-panel { 
-            display: none; line-height: 1.8; font-size: 0.95rem; color: #eee;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        .display-screen::before {
+            content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 10% 50%, var(--active-color, var(--color-0)) 0%, transparent 80%);
+            opacity: 0.25; z-index: 0; pointer-events: none; filter: blur(25px);
         }
-        .content-panel.active { display: block; animation: fadeIn 0.5s; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .content-panel { display: none; animation: softIn 0.8s ease; line-height: 2.2; font-size: 0.92rem; color: #ddd; position: relative; z-index: 1; }
+        .content-panel.active { display: block; }
+
+        @keyframes softIn { from { opacity: 0; transform: translateZ(50px); filter: blur(10px); } to { opacity: 1; transform: translateZ(0); filter: blur(0); } }
         
         @keyframes cosmosRotate {
-            0%, 100% { transform: rotateY(0deg) rotateX(0deg); }
-            50% { transform: rotateY(20deg) rotateX(10deg); }
+            0% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+            25% { transform: translateY(-15px) rotateX(8deg) rotateY(-18deg) rotateZ(-1deg); }
+            50% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+            75% { transform: translateY(15px) rotateX(-8deg) rotateY(18deg) rotateZ(1deg); }
+            100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
         }
 
-        .highlight { color: var(--active-color); font-weight: bold; text-shadow: 0 0 8px var(--active-color); }
+        .highlight { color: var(--active-color, var(--color-2)); font-weight: bold; text-shadow: 0 0 10px var(--active-color); }
+        footer { position: absolute; bottom: -45px; right: 0; font-size: 0.5rem; opacity: 0.2; letter-spacing: 2px; }
     </style>
 </head>
 <body>
+    <div class="bg-overlay" id="background"></div>
+    <div class="space-bg"></div>
+    
     <header>
         <h1 id="title">KC小宇宙</h1>
-        <div class="sync-info">
-            <span id="sync-status">SYNCING...</span>
-            <span id="sync-time">--:--:--</span>
+        <div class="sync-info" id="sync-info">
+            <span>DIM: 11D</span>
+            <span id="sync-status">STATUS: CONNECTING...</span>
+            <span>VECTOR: <span id="sync-time">--:--:--</span></span>
         </div>
+        <div class="divider-line" id="divider"></div>
     </header>
 
     <div class="container">
         <nav class="side-nav">
-            <div class="tab-btn active" onclick="switchPanel(0)" style="--c: var(--color-0)">诞生日</div>
-            <div class="tab-btn" onclick="switchPanel(1)" style="--c: var(--color-1)">旋转燃料</div>
-            <div class="tab-btn" onclick="switchPanel(2)" style="--c: var(--color-2)">照亮空间</div>
-            <div class="tab-btn" onclick="switchPanel(3)" style="--c: var(--color-3)">终极进化</div>
+            <div class="tab-btn btn-0 active" onclick="switchPanel(0)">诞生日</div>
+            <div class="tab-btn btn-1" onclick="switchPanel(1)">旋转燃料</div>
+            <div class="tab-btn btn-2" onclick="switchPanel(2)">照亮空间</div>
+            <div class="tab-btn btn-3" onclick="switchPanel(3)">终极进化</div>
         </nav>
         <main class="main-content">
-            <div class="display-screen">
-                <div class="content-panel active" id="panel-0">加载中...</div>
-                <div class="content-panel" id="panel-1"></div>
-                <div class="content-panel" id="panel-2"></div>
-                <div class="content-panel" id="panel-3"></div>
+            <div class="display-screen" id="screen">
+                <div class="content-panel active" id="panel-0">> 正在同步节点...</div>
+                <div class="content-panel" id="panel-1">> 同步中...</div>
+                <div class="content-panel" id="panel-2">> 同步中...</div>
+                <div class="content-panel" id="panel-3">> 同步中...</div>
             </div>
+            <footer>CORE // K_STATION_V10.1</footer>
         </main>
     </div>
 
@@ -107,27 +115,50 @@
         async function fetchCosmosData() {
             try {
                 const response = await fetch(DATA_URL);
+                if (!response.ok) throw new Error('Offline');
                 const data = await response.json();
+                
                 data.forEach((item, index) => {
-                    document.getElementById(`panel-${index}`).innerHTML = item.content;
+                    const panel = document.getElementById(`panel-${index}`);
+                    if (panel) panel.innerHTML = item.content;
                 });
-                document.getElementById('sync-status').innerText = "SYNC_STABLE";
-            } catch (e) { document.getElementById('sync-status').innerText = "OFFLINE"; }
+                
+                document.getElementById('sync-status').innerText = "STATUS: SYNC_STABLE";
+            } catch (error) {
+                console.error("同步失败:", error);
+                document.getElementById('sync-status').innerText = "STATUS: LOCAL_MODE";
+            }
         }
 
         function switchPanel(index) {
             const btns = document.querySelectorAll('.tab-btn');
             btns.forEach((btn, i) => btn.classList.toggle('active', i === index));
+            
             const panels = document.querySelectorAll('.content-panel');
-            panels.forEach((p, i) => p.classList.toggle('active', i === index));
-            document.documentElement.style.setProperty('--active-color', colors[index]);
+            panels.forEach((panel, i) => panel.classList.toggle('active', i === index));
+            
+            const activeColor = colors[index];
+            document.documentElement.style.setProperty('--active-color', activeColor);
+            
+            const syncInfo = document.getElementById('sync-info');
+            const divider = document.getElementById('divider');
+            syncInfo.classList.remove('sync-active');
+            divider.classList.remove('divider-active');
+            void divider.offsetWidth;
+            syncInfo.classList.add('sync-active');
+            divider.classList.add('divider-active');
         }
 
-        setInterval(() => {
-            document.getElementById('sync-time').innerText = new Date().toTimeString().split(' ')[0];
-        }, 1000);
+        function updateSyncTime() {
+            const now = new Date();
+            document.getElementById('sync-time').innerText = now.toTimeString().split(' ')[0];
+        }
 
-        window.onload = fetchCosmosData;
+        window.onload = () => {
+            fetchCosmosData();
+            updateSyncTime();
+            setInterval(updateSyncTime, 1000);
+        };
     </script>
 </body>
 </html>
