@@ -1,6 +1,19 @@
 [
-  { "order": 0, "content": "> 维度坐标锁定...<br><br>底层协议初始化完成。" },
-  { "order": 1, "content": "> 能量核心状态：稳定。<br><br>驱动燃料：黑白键共振、逻辑脉冲。<span class='highlight'>目前已开发自动恢复脚本，旨在缩短实际测试周期。</span>" },
-  { "order": 2, "content": "> 空间观测：极寒维度光影残迹。" },
-  { "order": 3, "content": "> 进化状态：无限重塑与迭代。" }
+  {
+    "order": 0,
+    "content": "> 维度坐标锁定...<br><br>在宏观世界的某个坐标点，意识开始觉醒。这不仅是一个时间的刻度，更是<span class='highlight'>底层协议初始化</span>的瞬间。灵魂与数字序列在此刻交织。"
+  },
+  {
+    "order": 1,
+    "content": "> 能量核心检测...<br><br>驱动宇宙扩张的燃料：是<span class='highlight'>黑白键上的频率共振</span>，是深度思考时的<span class='highlight'>逻辑脉冲</span>，以及对高维几何对称之美的好奇。<span class='highlight'>目前已开发自动恢复脚本，旨在缩短实际测试周期。</span>"
+  },
+  {
+    "order": 2,
+    "content": "> 时空观测记录...<br><br>从<span class='highlight'>极寒维度的光影残迹</span>到赛博空间的扰动，每一处被意识照亮的地方，都留下了观测者独特的<span class='highlight'>引力轨迹</span>。"
+  },
+  {
+    "order": 3,
+    "content": "> 进化协议加载...<br><br>打破现有维度的认知局限。将<span class='highlight'>严谨的理性</span>与<span class='highlight'>流动的艺术感官</span>融合，向更高维度的自己进行无限次的<span class='highlight'>重塑与迭代</span>。"
+  }
 ]
+
