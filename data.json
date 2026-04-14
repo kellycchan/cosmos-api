@@ -13,6 +13,29 @@
       "content": "> 逻辑重构中...<br>> 状态：<span class='highlight'>终极进化</span><br>> 正在学习 Python 自动化与钢琴和弦。代码与音符在虚空中交织，构建更完整的自我。"
     }
   ],
+  /* * [光谱权重系统说明]
+ * -----------------------------------------------------------------
+ * 权重 (uniqueness) | 视觉表现      | 物理意义
+ * -----------------------------------------------------------------
+ * 18 - 20          | #ffffff (纯白) | 核心恒星：最高能量，转速最快，强发光
+ * 14 - 17          | #ffd54f (琥珀黄)| 活跃行星：中高能量，暖色调，较快转速
+ * 10 - 13          | #ff5252 (珊瑚红)| 警示/焦点：中等能量，红色醒目，中等转速
+ * 01 - 09          | 随机星空色系    | 边缘星尘：基础能量，蓝/紫/青/橙，慢速漂浮
+ * -----------------------------------------------------------------
+ */
+
+// 对应的逻辑实现代码：
+let color;
+*if (weight >= 18) { 
+    *color = "#ffffff"; // 顶级权重：纯白
+*} else if (weight >= 14) { 
+    *color = "#ffd54f"; // 高权重：琥珀黄
+*} else if (weight >= 10) { 
+    *color = "#ff5252"; // 中高权重：珊瑚红
+*} else { 
+    *color = starColors[i % starColors.length]; // 基础权重：在蓝/青/紫/橙中循环
+}//
+
   "readBooks": [
     { "title": "三体", "uniqueness": 20 },
     { "title": "基地", "uniqueness": 12 },
@@ -34,7 +57,7 @@
     { "title": "沉默的大多数", "uniqueness": 15 },
     { "title": "鲁迅全集", "uniqueness": 5 },
     { "title": "银河帝国", "uniqueness": 8 },
-    { "title": "造彩虹的人", "uniqueness": 15 },
+    { "title": "造彩虹的人", "uniqueness": 19 },
     { "title": "放学后", "uniqueness": 4 },
     { "title": "1984", "uniqueness": 18 },
     { "title": "黑暗森林", "uniqueness": 8 },
@@ -51,7 +74,7 @@
     { "title": "白鸟与蝙蝠", "uniqueness": 6 },
     { "title": "1988我想和这个世界谈谈", "uniqueness": 20 },
     { "title": "读库", "uniqueness": 10 },
-    { "title": "看上去很美", "uniqueness": 15 },
+    { "title": "看上去很美", "uniqueness": 9 },
     { "title": "红拂夜奔", "uniqueness": 10 },
     { "title": "白银时代", "uniqueness": 12 },
     { "title": "一只特立独行的猪", "uniqueness": 13 },
@@ -66,16 +89,16 @@
     { "title": "再见企鹅", "uniqueness": 2 },
     { "title": "直到世界尽头", "uniqueness": 1 },
     { "title": "静静的顿河", "uniqueness": 13 },
-    { "title": "悲喜同源", "uniqueness": 17 },
-    { "title": "诗人十四个", "uniqueness": 17 },
+    { "title": "悲喜同源", "uniqueness": 7 },
+    { "title": "诗人十四个", "uniqueness": 6 },
     { "title": "数学之美", "uniqueness": 7 },
     { "title": "书架", "uniqueness": 1 },
     { "title": "它们没有脚，但足迹遍天下", "uniqueness": 17 },
     { "title": "它们没大脑，但他它们有智能", "uniqueness": 15 },
     { "title": "失敬，植物先生", "uniqueness": 20 },
-    { "title": "细读张爱玲", "uniqueness": 13 },
+    { "title": "细读张爱玲", "uniqueness": 9 },
     { "title": "你不必着急成为一个大人", "uniqueness": 1 },
-    { "title": "超新星纪元", "uniqueness": 17 },
+    { "title": "超新星纪元", "uniqueness": 7 },
     { "title": "神们自己", "uniqueness": 20 },
     { "title": "阿西莫夫：机器人短篇全集", "uniqueness": 19 },
     { "title": "和喜欢的一切在一起", "uniqueness": 7 },
