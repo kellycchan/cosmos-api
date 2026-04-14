@@ -91,45 +91,58 @@
             } catch (e) { statusTag.innerText = "ERROR"; }
         }
 
-        function initStars() {
+                function initStars() {
             const container = document.getElementById('fuel-nebula');
             container.innerHTML = '';
             stars = [];
-            const count = remoteBooks.length;
+            const displayList = remoteBooks.slice(0, 150); 
+            const count = displayList.length;
 
-            remoteBooks.forEach((book, i) => {
-                const el = document.createElement('div');
-                el.className = 'star-item';
-                el.innerText = book.title;
+            // 重新定义的明亮色库（去除了深蓝、深紫、黑色）
+            const brightColors = ['#a0e9ff', '#98ff98', '#ffb7ff', '#e0f7fa', '#d1d1d1'];
 
-                // --- 逻辑校准：强制去空格、强制转整型 ---
-                const rawVal = String(book.uniqueness).replace(/[^0-9.]/g, ''); // 只保留数字和点
-                const w = parseInt(rawVal, 10) || 5;
+            displayList.forEach((book, i) => {
+                const item = document.createElement('div');
+                item.className = 'star-item';
+                item.innerText = book.title;
+                
+                // 强制类型清洗，防止数据格式带偏权重
+                const weight = parseFloat(String(book.uniqueness).trim()) || 5; 
+                let color;
+                
+                // --- 按照你的最新要求设置阀值 ---
+                if (weight >= 20) { 
+                    color = "#ffffff"; // 20: 纯白
+                } else if (weight >= 19) { 
+                    color = "#ffd54f"; // 19: 黄色
+                } else if (weight >= 18) { 
+                    color = "#ff5252"; // 18: 红色
+                } else if (weight >= 10) { 
+                    color = "#5c9cd9"; // 10-17: 蓝色
+                } else { 
+                    // 10以下：从明亮彩色池随机，绝不包含黑色
+                    color = brightColors[i % brightColors.length]; 
+                }
 
-                let col;
-                // 提高阈值，确保稀有
-                if (w >= 20) col = "#ffffff";
-                else if (w >= 16) col = "#ffd54f";
-                else if (w >= 12) col = "#ff5252";
-                else col = starColors[i % starColors.length];
-
-                el.style.color = col;
-                el.style.textShadow = `0 0 ${w/3}px ${col}`;
-                // 略微调小字号，增加散开半径，物理性解决遮挡
-                el.style.fontSize = (0.4 + w/55) + "rem";
+                item.style.color = color;
+                item.style.textShadow = `0 0 ${4 + weight/4}px ${color}`;
+                
+                // 字号也随你的阶梯微调
+                const baseSize = count > 80 ? 0.42 : 0.48;
+                item.style.fontSize = `${baseSize + weight/45}rem`;
 
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                const r = 145; 
+                const radius = count > 80 ? 175 : 160; 
 
                 stars.push({
-                    el: el,
-                    x: r * Math.sin(phi) * Math.cos(theta),
-                    y: r * Math.sin(phi) * Math.sin(theta),
-                    z: r * Math.cos(phi),
-                    v: (0.005 + (w * w) / 45000)
+                    el: item,
+                    x: radius * Math.sin(phi) * Math.cos(theta),
+                    y: radius * Math.sin(phi) * Math.sin(theta),
+                    z: radius * Math.cos(phi),
+                    speed: (0.005 + (weight * weight) / 38000)
                 });
-                container.appendChild(el);
+                container.appendChild(item);
             });
         }
 
