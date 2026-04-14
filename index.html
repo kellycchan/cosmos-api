@@ -7,65 +7,60 @@
     <style>
         :root { --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
         
-        .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(25px) brightness(25%); transition: transform 0.5s ease-out; }
-        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 0.3) 0%, rgba(0, 0, 0, 0.8) 100%); }
+        .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(25px) brightness(25%); }
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 0.3) 0%, rgba(0, 0, 0, 0.9) 100%); }
         
-        header { position: fixed; top: 0; left: 0; width: 100vw; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 20; padding-top: 20px; }
+        header { position: fixed; top: 0; left: 0; width: 100vw; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 20; }
         h1 { font-size: 1.4rem; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; margin-bottom: 15px; }
         .sync-info { font-size: 0.5rem; color: #444; letter-spacing: 2px; display: flex; gap: 15px; }
-        .sync-active { color: var(--active-color, var(--color-0)); text-shadow: 0 0 10px var(--active-color); }
         .divider-line { width: 100px; height: 1px; background: rgba(255,255,255,0.1); margin-top: 10px; transition: all 0.6s; }
         .divider-active { width: 180px; background: linear-gradient(90deg, transparent 0%, var(--active-color) 50%, transparent 100%); box-shadow: 0 0 10px var(--active-color); }
 
         .container { display: flex; height: 100vh; width: 100vw; padding: 15px; gap: 20px; align-items: center; justify-content: center; transform: translateY(30px); }
-        
         .side-nav { display: flex; flex-direction: column; width: 80px; gap: 15px; z-index: 10; }
-        .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #555; width: 70px; height: 70px; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 18px; writing-mode: vertical-rl; letter-spacing: 3px; transition: all 0.4s ease; }
-        .tab-btn.active { color: #fff; transform: translateX(5px); border-color: var(--active-color); background: rgba(255,255,255,0.08); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #555; width: 70px; height: 70px; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 18px; writing-mode: vertical-rl; letter-spacing: 3px; transition: all 0.4s; }
+        .tab-btn.active { color: #fff; transform: translateX(5px); border-color: var(--active-color); background: rgba(255,255,255,0.08); }
 
-        .main-content { width: 280px; height: 450px; position: relative; perspective: 1200px; }
+        .main-content { width: 300px; height: 480px; position: relative; perspective: 1500px; }
         .display-screen { 
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(30px); 
             padding: 40px 25px; height: 100%; width: 100%; position: relative; 
             clip-path: polygon(8% 0%, 100% 5%, 100% 92%, 92% 100%, 0% 95%, 0% 8%);
-            border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; scrollbar-width: none;
+            border: 1px solid rgba(255,255,255,0.1); overflow: hidden;
         }
-        .display-screen::-webkit-scrollbar { display: none; }
 
-        .content-panel { display: none; animation: panelFade 0.6s ease; line-height: 2.4; font-size: 0.9rem; color: #ccc; position: relative; z-index: 1; }
-        .content-panel.active { display: block; }
+        .content-panel { display: none; line-height: 2.4; font-size: 0.95rem; color: #ccc; height: 100%; overflow-y: auto; scrollbar-width: none; }
+        .content-panel::-webkit-scrollbar { display: none; }
+        .content-panel.active { display: block; animation: panelFade 0.6s ease; }
 
-        /* 3D星系优化 */
-        #fuel-nebula { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.5s; }
+        /* 星云容器：原点居中 */
+        #fuel-nebula { 
+            position: absolute; top: 50%; left: 50%; 
+            width: 0; height: 0; 
+            transform-style: preserve-3d; 
+            transition: transform 0.8s cubic-bezier(0.2, 0, 0.2, 1);
+        }
         .star-item { 
-            position: absolute; cursor: pointer; color: #7dbdbd; font-family: 'Courier New', monospace; 
+            position: absolute; cursor: pointer; color: #7dbdbd; font-family: monospace; 
             font-weight: bold; text-shadow: 0 0 8px #7dbdbd; white-space: nowrap; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transform-origin: center; transform: translate(-50%, -50%); /* 自身居中 */
+            transition: all 0.6s ease; 
         }
-        .star-item:hover { color: #fff; text-shadow: 0 0 20px #fff; transform: scale(1.2) !important; }
 
-        @keyframes panelFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fuelCollapse { to { transform: translate3d(0,0,-600px) scale(0); opacity: 0; filter: blur(10px); } }
-        .collapsing { animation: fuelCollapse 0.7s forwards; }
-
-        footer { position: absolute; bottom: -35px; right: 10px; font-size: 0.5rem; opacity: 0.3; letter-spacing: 2px; }
+        @keyframes panelFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .highlight { color: var(--active-color); text-shadow: 0 0 10px var(--active-color); }
     </style>
 </head>
 <body>
-    <div class="bg-overlay" id="background"></div>
+    <div class="bg-overlay"></div>
     <div class="space-bg"></div>
-    
     <header>
-        <h1 id="title">KC小宇宙</h1>
-        <div class="sync-info" id="sync-info">
-            <span>DIM: 11D</span><span id="sync-status">STATUS: INIT</span><span>VECTOR: <span id="sync-time">--:--</span></span>
-        </div>
+        <h1>KC小宇宙</h1>
+        <div class="sync-info"><span>DIM: 11D</span><span id="sync-status">STATUS: INIT</span><span>VECTOR: <span id="sync-time">--:--</span></span></div>
         <div class="divider-line" id="divider"></div>
     </header>
-
     <div class="container">
         <nav class="side-nav">
             <div class="tab-btn active" onclick="switchPanel(0)">诞生日</div>
@@ -75,12 +70,12 @@
         </nav>
         <main class="main-content">
             <div class="display-screen">
-                <div class="content-panel active" id="panel-0">> 正在同步节点数据...</div>
+                <div class="content-panel active" id="panel-0"></div>
                 <div class="content-panel" id="panel-1"><div id="fuel-nebula"></div></div>
-                <div class="content-panel" id="panel-2">> 同步中...</div>
-                <div class="content-panel" id="panel-3">> 同步中...</div>
+                <div class="content-panel" id="panel-2"></div>
+                <div class="content-panel" id="panel-3"></div>
             </div>
-            <footer>CORE // K_STATION_V11.0</footer>
+            <footer>CORE // K_STATION_V11.5</footer>
         </main>
     </div>
 
@@ -101,53 +96,37 @@
                 }
                 if (data.readBooks) remoteBooks = data.readBooks;
                 document.getElementById('sync-status').innerText = "STATUS: SYNC_STABLE";
-                document.getElementById('sync-status').classList.add('sync-active');
-                if(document.querySelector('.tab-btn.active').innerText.includes('燃料')) renderFuelNebula();
-            } catch (e) {
-                document.getElementById('sync-status').innerText = "STATUS: OFFLINE";
-            }
+                document.getElementById('sync-status').style.color = colors[0];
+            } catch (e) { document.getElementById('sync-status').innerText = "STATUS: ERROR"; }
         }
 
-                function renderFuelNebula() {
+        function renderFuelNebula() {
             const container = document.getElementById('fuel-nebula');
             if(!container || remoteBooks.length === 0) return;
             container.innerHTML = '';
             
-            // 【核心修复点】环形星系算法
-            // 不再让坐标随机乱飞，而是绕中心按圆周率排列，彻底解决遮挡
-            const bookCount = remoteBooks.length;
             remoteBooks.forEach((book, i) => {
                 const item = document.createElement('div');
                 item.className = 'star-item';
                 item.innerText = book.title;
                 
-                // 计算每个书名的角度和半径（形成旋涡状）
-                const angle = (i / bookCount) * Math.PI * 2; // 分散在 360 度上
-                const radius = 90 + Math.random() * 30; // 核心环绕半径
-                
-                // 计算 X, Y, Z 坐标
+                // 黄金比例环形分布
+                const angle = (i / remoteBooks.length) * Math.PI * 2;
+                const radius = 100 + (i * 5); // 半径随序号增加，形成螺旋向外
                 const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius * 1.3; // 稍微拉高垂直分布
-                const z = Math.sin(angle * 2) * 150; // Z轴（深度）根据角度也产生波动
-                
-                // 根据Z轴深度设置缩放和透明度，增加空间感
-                const scale = (book.uniqueness / 10) + (z + 200) / 450;
-                
-                // 应用 3D 变换
-                item.style.transform = `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
-                item.style.opacity = (z + 250) / 400 + 0.1; // 越远越暗
-                item.style.fontSize = `${0.75 + book.uniqueness/20}rem`; // uniqueness 大小也对齐
-                
-                // 【对齐初衷】点击只变亮，不消失
+                const y = Math.sin(angle) * radius * 0.8;
+                const z = Math.sin(angle * 2) * 200; 
+
+                item.style.transform = `translate3d(${x}px, ${y}px, ${z}px) translate(-50%, -50%) scale(${(z+300)/500})`;
+                item.style.opacity = (z + 300) / 600;
+                if (z < -50) item.style.filter = `blur(${Math.abs(z)/50}px)`; // 远处模糊
+
                 item.onclick = (e) => {
                     e.stopPropagation();
-                    // 改变颜色为纯白，增强光晕
                     item.style.color = "#ffffff";
-                    item.style.textShadow = "0 0 25px #ffffff, 0 0 45px var(--active-color)";
-                    item.style.transform += " scale(1.1)"; // 点击时稍微放大一点点
-                    console.log("燃料已激活:", book.title);
+                    item.style.textShadow = "0 0 20px #ffffff, 0 0 40px #7dbdbd";
+                    item.style.zIndex = "100";
                 };
-                
                 container.appendChild(item);
             });
         }
@@ -156,21 +135,12 @@
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === index));
             document.querySelectorAll('.content-panel').forEach((p, i) => p.classList.toggle('active', i === index));
             document.documentElement.style.setProperty('--active-color', colors[index]);
-            
             const div = document.getElementById('divider');
-            div.classList.remove('divider-active');
-            void div.offsetWidth;
-            div.classList.add('divider-active');
-
-            if(index === 1) {
-                setTimeout(renderFuelNebula, 100);
-            }
+            div.classList.remove('divider-active'); void div.offsetWidth; div.classList.add('divider-active');
+            if(index === 1) setTimeout(renderFuelNebula, 100);
         }
 
-        setInterval(() => {
-            document.getElementById('sync-time').innerText = new Date().toTimeString().split(' ')[0];
-        }, 1000);
-
+        setInterval(() => { document.getElementById('sync-time').innerText = new Date().toTimeString().split(' ')[0].substring(0,5); }, 1000);
         window.onload = fetchCosmosData;
     </script>
 </body>
