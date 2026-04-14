@@ -1,18 +1,30 @@
-[
-  {
-    "order": 0,
-    "content": "> 维度坐标锁定...<br><br>在宏观世界的某个坐标点，意识开始觉醒。这不仅是一个时间的刻度，更是<span class='highlight'>底层协议初始化</span>的瞬间。灵魂与数字序列在此刻交织。"
-  },
-  {
-    "order": 1,
-    "content": "> 能量核心检测...<br><br>驱动宇宙扩张的燃料：是<span class='highlight'>黑白键上的频率共振</span>，是深夜思考时的<span class='highlight'>逻辑脉冲</span>，以及对高维几何对称之美的好奇。"
-  },
-  {
-    "order": 2,
-    "content": "> 时空观测记录...<br><br>从<span class='highlight'>极寒维度的光影残迹</span>到赛博空间的微弱扰动，每一处被意识照亮的地方，都留下了观测者独特的<span class='highlight'>引力轨迹</span>。"
-  },
-  {
-    "order": 3,
-    "content": "> 进化协议加载...<br><br>打破现有维度的认知局限。将<span class='highlight'>严谨的理性</span>与<span class='highlight'>流动的艺术感官</span>融合，向更高维度的自己进行无限次的<span class='highlight'>重塑与迭代</span>。"
-  }
-]
+{
+  "panels": [
+    {
+      "order": 0,
+      "content": "> 维度坐标锁定...<br><br>在观测世界的某个坐标点，Q还在实验室，这不仅是一个时间的节点，更是<span class='highlight'>新的起点</span>。"
+    },
+    {
+      "order": 1,
+      "content": "> 能量核心检测...<br><br>核心参数正在持续更新：是<span class='highlight'>那些深邃的共振</span>，引导着信号的频率。"
+    },
+    {
+      "order": 2,
+      "content": "> 时空跃迁副本...<br><br>从<span class='highlight'>纷繁的杂音中</span>剥离出真实的波长，每一处波段都记录着..."
+    },
+    {
+      "order": 3,
+      "content": "> 进化协议加载...<br><br>不曾停止的观测序列，在<span class='highlight'>无限的属性</span>中寻找单一的确定性。"
+    }
+  ],
+  "readBooks": [
+    { "title": "三体全集", "uniqueness": 10 },
+    { "title": "失控", "uniqueness": 9 },
+    { "title": "平凡的世界", "uniqueness": 8 },
+    { "title": "人类简史", "uniqueness": 7 },
+    { "title": "瓦尔登湖", "uniqueness": 9 },
+    { "title": "沉默的大多数", "uniqueness": 9 },
+    { "title": "自私的基因", "uniqueness": 7 },
+    { "title": "认知觉醒", "uniqueness": 8 }
+  ]
+}
