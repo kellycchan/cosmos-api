@@ -99,25 +99,34 @@ function initStars() {
 }
 
 function animate() {
-    stars.forEach(s => {
-        // 使用更高效的局部变量减少计算开销
+    stars.forEach((s, idx) => {
+        // --- 核心逻辑：给每颗星分配一个基于索引的固定轨道偏角 ---
+        // 使用 sin(idx) 产生一个 -0.5 到 0.5 之间的固定偏角，保证每本书轨迹不同但稳定
+        const tilt = Math.sin(idx) * 0.4; 
+        
         const cosV = Math.cos(s.v);
         const sinV = Math.sin(s.v);
+
+        // 复杂的 3D 旋转：不再只是绕着 Y 轴转
+        // 我们引入 tilt 让 X、Y、Z 三轴同时产生位移变化
         const x1 = s.x * cosV - s.z * sinV;
         const z1 = s.z * cosV + s.x * sinV;
-        s.x = x1; s.z = z1;
-        
-        // 调整缩放感，让手机端更有冲出屏幕的冲击力
+        const y1 = s.y + (s.x * sinV + s.z * (1 - cosV)) * tilt;
+
+        s.x = x1;
+        s.z = z1;
+        s.y = y1 * 0.998; // 极其微弱的向圆心收拢，防止文字飞离中心
+
+        // 渲染逻辑
         const scale = (s.z + 200) / 450 * 0.6 + 0.4;
         const opacity = (s.z + 200) / 450 * 0.7 + 0.2;
-        
-        // 强制开启硬件加速
+
         s.el.style.transform = `translate3d(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px, ${s.z.toFixed(1)}px) scale(${scale.toFixed(2)})`;
         s.el.style.opacity = opacity;
+        s.el.style.zIndex = Math.floor(s.z + 200);
     });
     requestAnimationFrame(animate);
 }
-
 
         function switchPanel(idx) {
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
