@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC小宇宙-能量加强版</title>
+    <title>KC小宇宙-V14.1 修复版</title>
     <style>
         :root { --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -17,31 +17,32 @@
         .side-nav { display: flex; flex-direction: column; width: 85px; gap: 12px; z-index: 10; }
         .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #444; width: 75px; height: 85px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 20px; writing-mode: vertical-rl; letter-spacing: 4px; transition: 0.4s; }
         .tab-btn.active { color: #fff; border-color: var(--active-color); background: rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--active-color); }
-        .main-content { width: 300px; height: 450px; position: relative; perspective: 1000px; }
+        .main-content { width: 300px; height: 450px; position: relative; perspective: 1200px; }
         .display-screen { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(25px); padding: 35px 25px; height: 100%; width: 100%; position: relative; clip-path: polygon(8% 0%, 100% 5%, 100% 95%, 92% 100%, 0% 95%, 0% 8%); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
         .content-panel { display: none; height: 100%; overflow-y: auto; scrollbar-width: none; line-height: 2.2; font-size: 0.95rem; color: #ccc; }
         .content-panel.active { display: block; }
 
-        /* 旋转容器 */
+        /* 修复核心：全局容器使用 2D 旋转，不影响 3D 分布 */
         #fuel-nebula { 
             position: absolute; top: 50%; left: 50%; 
             width: 10px; height: 10px; 
             transform-style: preserve-3d;
-            animation: globalRotate 40s infinite linear; 
+            animation: global2DRotate 50s infinite linear; /* 改为 2D 旋转 */
         }
+        
         .star-item { 
             position: absolute; cursor: pointer; font-weight: bold; 
             white-space: nowrap; transform-origin: center;
-            transition: color 0.5s, text-shadow 0.5s;
+            transition: color 0.4s, text-shadow 0.4s, font-size 0.4s;
         }
 
-        /* 基础全局旋转 */
-        @keyframes globalRotate { 
-            from { transform: translate(-50%, -50%) rotateY(0deg); }
-            to { transform: translate(-50%, -50%) rotateY(360deg); }
+        /* 修正后的全局旋转（2D 旋转，保持空间分布） */
+        @keyframes global2DRotate { 
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        /* 个体加速动画：根据权重会动态修改速度 */
+        /* 个体加速动画保持 3D 特性 */
         @keyframes fastRotate {
             from { transform: rotateY(0deg); }
             to { transform: rotateY(360deg); }
@@ -72,7 +73,7 @@
             </div>
         </main>
     </div>
-    <footer>CORE // K_STATION_V14.0</footer>
+    <footer>V14.1 HOTFIX</footer>
 
     <script>
         const DATA_URL = "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Math.random();
@@ -91,6 +92,7 @@
                     });
                 }
                 if (data.readBooks) { remoteBooks = data.readBooks; renderFuelNebula(); }
+                document.getElementById('sync-status').innerText = "STATUS: SYNC_STABLE";
             } catch (e) { document.getElementById('sync-status').innerText = "STATUS: OFFLINE"; }
         }
 
@@ -105,41 +107,42 @@
                 item.className = 'star-item';
                 item.innerText = book.title;
                 
+                // --- 物理参数调优 (Hotfix) ---
                 const weight = book.uniqueness || 5;
                 
-                // 1. 颜色逻辑
+                // 1. 颜色与层次优化
                 let color;
                 if (weight >= 15) { color = "#ffffff"; item.style.zIndex = "100"; }
                 else if (weight >= 10) { color = "#e0f7fa"; item.style.zIndex = "50"; }
                 else { color = starColors[i % starColors.length]; item.style.zIndex = "1"; }
                 item.style.color = color;
-                item.style.textShadow = `0 0 10px ${color}`;
+                item.style.textShadow = `0 0 ${8 + weight/2}px ${color}`; // 发光强度关联权重
                 
-                // 2. 字体逻辑
-                item.style.fontSize = `${0.45 + weight/35}rem`;
+                // 2. 字体微调 (Hotfix: 基础字号稍微加大，增量减小，防止崩塌时太杂乱)
+                item.style.fontSize = `${0.5 + weight/40}rem`;
 
-                // 3. 3D 坐标
+                // 3. 3D 坐标分布 ( Hotfix: 半径从 135 增加到 145，强制散开)
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                const radius = 135; 
+                const radius = 145; 
                 const x = radius * Math.sin(phi) * Math.cos(theta);
                 const y = radius * Math.sin(phi) * Math.sin(theta);
                 const z = radius * Math.cos(phi);
 
-                // 4. 【核心：能量关联转速】
-                // 权重越高，动画时长(duration)越短，转得越快
-                // 默认 30s，权重 20 时变为 10s
-                const duration = 40 - (weight * 1.5); 
+                // 4. 转速逻辑 (Hotfix: 增加基础时长，减小加速幅度，更稳健)
+                // 权重越高，动画时长变为: 50s - 20s = 30s，能量差异依然在
+                const duration = 50 - (weight); 
                 item.style.animation = `fastRotate ${duration}s infinite linear`;
 
+                // 物理定位
                 item.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
                 item.style.opacity = (z + radius) / (2 * radius) + 0.3;
 
                 item.onclick = (e) => {
                     e.stopPropagation();
                     item.style.color = "#ffffff";
-                    item.style.textShadow = "0 0 30px #ffffff";
-                    item.style.transform += " scale(1.5)";
+                    item.style.textShadow = "0 0 30px #ffffff, 0 0 50px #ffffff";
+                    item.style.transform += " scale(1.4)";
                 };
                 container.appendChild(item);
             });
