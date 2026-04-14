@@ -3,125 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC宇宙-V18.0</title>
+    <title>KC宇宙-V18.2-SoftColor</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: radial-gradient(circle at center, #0a1b3d 0%, #000000 100%); 
-            color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; 
-        }
-        
+        body { background: radial-gradient(circle at center, #050c1a 0%, #000000 100%); color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
         header { position: fixed; top: 0; left: 0; width: 100vw; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
-        h1 { font-size: 1.4rem; letter-spacing: 10px; text-shadow: 0 0 20px #5c9cd9; text-transform: uppercase; }
-        .sync-info { font-size: 0.55rem; color: rgba(255, 255, 255, 0.5); margin-top: 8px; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-        
+        h1 { font-size: 1.4rem; letter-spacing: 10px; text-shadow: 0 0 20px rgba(92, 156, 217, 0.5); text-transform: uppercase; opacity: 0.8; }
+        .sync-info { font-size: 0.55rem; color: rgba(255, 255, 255, 0.3); margin-top: 8px; letter-spacing: 1px; }
         .side-nav { position: fixed; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 200; }
-        .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #777; width: 55px; height: 75px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; border-radius: 15px; writing-mode: vertical-rl; cursor: pointer; transition: 0.4s; backdrop-filter: blur(5px); }
-        .tab-btn.active { color: #fff; border-color: #5c9cd9; background: rgba(92, 156, 217, 0.2); box-shadow: 0 0 15px #5c9cd9; }
-        
-        .viewport { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; perspective: 1000px; z-index: 10; display: none; }
+        .tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #555; width: 52px; height: 75px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; border-radius: 12px; writing-mode: vertical-rl; cursor: pointer; transition: 0.4s; backdrop-filter: blur(5px); }
+        .tab-btn.active { color: #fff; border-color: rgba(92, 156, 217, 0.5); background: rgba(92, 156, 217, 0.15); box-shadow: 0 0 15px rgba(92, 156, 217, 0.3); }
+        .viewport { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; perspective: 1200px; z-index: 10; display: none; }
         .viewport.active { display: block; }
-        
-        /* 旋转燃料文案放置区域 */
-        #fuel-intro { position: absolute; top: 110px; left: 50%; transform: translateX(-50%); width: 80%; text-align: center; color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.6; z-index: 5; pointer-events: none; }
-        
+        #fuel-intro { position: absolute; top: 115px; left: 50%; transform: translateX(-50%); width: 85%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.8rem; line-height: 1.6; z-index: 5; pointer-events: none; }
         #fuel-nebula { position: absolute; top: 50%; left: 50%; transform-style: preserve-3d; }
-        
-        /* 核心改动：去掉所有黑框和边框，文字直接悬浮 */
-        .content-panel { position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 85vw; max-height: 70vh; background: transparent; border: none; padding: 20px; overflow-y: auto; display: none; z-index: 150; color: #ccc; line-height: 1.8; font-size: 0.95rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .content-panel { position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 85vw; max-height: 70vh; background: transparent; padding: 20px; overflow-y: auto; display: none; z-index: 150; color: #aaa; line-height: 1.8; font-size: 0.95rem; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
         .content-panel.active { display: block; }
-        
-        .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; }
-        footer { position: fixed; bottom: 12px; width: 100%; text-align: center; font-size: 0.45rem; color: rgba(255, 255, 255, 0.4); letter-spacing: 2px; pointer-events: none; }
+        .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; transition: opacity 0.3s; }
+        footer { position: fixed; bottom: 12px; width: 100%; text-align: center; font-size: 0.45rem; color: rgba(255, 255, 255, 0.2); letter-spacing: 2px; }
+        .highlight { color: #5c9cd9; }
     </style>
 </head>
 <body>
-    <header>
-        <h1>KC小宇宙</h1>
-        <div class="sync-info">STATION_V18.0 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
-    </header>
-
-    <div class="viewport" id="viewport-universe">
-        <div id="fuel-intro"></div>
-        <div id="fuel-nebula"></div>
-    </div>
-
+    <header><h1>KC小宇宙</h1><div class="sync-info">STATION_V18.2 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div></header>
+    <div class="viewport" id="viewport-universe"><div id="fuel-intro"></div><div id="fuel-nebula"></div></div>
     <nav class="side-nav">
         <div class="tab-btn active" onclick="switchPanel(0)">诞生日</div>
         <div class="tab-btn" onclick="switchPanel(1)">旋转燃料</div>
         <div class="tab-btn" onclick="switchPanel(2)">照亮空间</div>
         <div class="tab-btn" onclick="switchPanel(3)">终极进化</div>
     </nav>
-
-    <div id="panels-container">
-        <div class="content-panel" id="panel-0"></div>
-        <div class="content-panel" id="panel-2"></div>
-        <div class="content-panel" id="panel-3"></div>
-    </div>
-
-    <footer>KC_COSMOS_V18.0_ULTRA_CLEAN</footer>
+    <div id="panels-container"><div class="content-panel" id="panel-0"></div><div class="content-panel" id="panel-2"></div><div class="content-panel" id="panel-3"></div></div>
+    <footer>KC_COSMOS_V18.2_SOFT_TURBO</footer>
 
     <script>
         const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
-        const brightPool = ['#a0e9ff', '#ffb7ff', '#98ff98', '#ffcc80', '#e0f7fa', '#81d8d0'];
-        let remoteBooks = [];
-        let stars = [];
+        // 莫兰迪低饱和度色池
+        const morandiPool = ['hsl(190, 20%, 60%)', 'hsl(280, 15%, 65%)', 'hsl(150, 15%, 60%)', 'hsl(35, 25%, 60%)', 'hsl(210, 20%, 65%)', 'hsl(0, 15%, 65%)'];
+        let remoteBooks = []; let stars = [];
 
         async function fetchCosmosData() {
-            const statusTag = document.getElementById('sync-status');
-            statusTag.innerText = "SYNC...";
+            const statusTag = document.getElementById('sync-status'); statusTag.innerText = "SYNC...";
             try {
-                const res = await fetch(getUrl());
-                const data = await res.json();
-                if (data.panels) {
-                    data.panels.forEach((item, idx) => {
-                        const p = document.getElementById(`panel-${idx}`);
-                        if (p) p.innerHTML = item.content;
-                        // 特殊处理：把原本 panel-1 的内容提取到旋转界面的 intro 区
-                        if (idx === 1) document.getElementById('fuel-intro').innerHTML = item.content;
-                    });
-                }
+                const res = await fetch(getUrl()); const data = await res.json();
+                if (data.panels) { data.panels.forEach((item, idx) => {
+                    const p = document.getElementById(`panel-${idx}`); if (p) p.innerHTML = item.content;
+                    if (idx === 1) document.getElementById('fuel-intro').innerHTML = item.content;
+                }); }
                 if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
                 statusTag.innerText = "OK";
             } catch (e) { statusTag.innerText = "OFFLINE"; }
         }
 
         function initStars() {
-            const container = document.getElementById('fuel-nebula');
-            container.innerHTML = '';
-            stars = [];
+            const container = document.getElementById('fuel-nebula'); container.innerHTML = ''; stars = [];
             const count = remoteBooks.length;
-            const r = Math.max(window.innerWidth, window.innerHeight) * 0.42;
-
+            const r = Math.max(window.innerWidth, window.innerHeight) * 0.45;
+            
             remoteBooks.forEach((book, i) => {
-                const el = document.createElement('div');
-                el.className = 'star-item';
-                el.innerText = book.title;
-
-                let val = String(book.uniqueness).replace(/[^0-9.]/g, ''); 
-                const w = parseFloat(val) || 5;
+                const el = document.createElement('div'); el.className = 'star-item'; el.innerText = book.title;
+                let val = String(book.uniqueness).replace(/[^0-9.]/g, ''); const w = parseFloat(val) || 5;
                 
                 let col;
-                if (w >= 20) col = "#ffffff";
-                else if (w >= 19) col = "#ffd54f";
-                else if (w >= 18) col = "#ff5252";
-                else if (w >= 10) col = "#5c9cd9";
-                else col = brightPool[i % brightPool.length];
+                // 低饱和度色彩逻辑
+                if (w >= 20) { col = "hsl(0, 0%, 90%)"; el.style.textShadow = `0 0 ${w/4}px rgba(255,255,255,0.4)`; } 
+                else if (w >= 18) { col = "hsl(40, 40%, 65%)"; el.style.textShadow = `0 0 ${w/5}px rgba(255,200,100,0.2)`; }
+                else if (w >= 10) { col = "hsl(210, 30%, 60%)"; el.style.textShadow = "none"; }
+                else { col = morandiPool[i % morandiPool.length]; el.style.textShadow = "none"; }
 
                 el.style.color = col;
-                el.style.textShadow = `0 0 ${w/3}px ${col}`;
-                const lenRatio = book.title.length > 8 ? 0.85 : 1;
-                el.style.fontSize = `${(0.48 + w/50) * lenRatio}rem`;
-
-                const phi = Math.acos(-1 + (2 * i) / count);
-                const theta = Math.sqrt(count * Math.PI) * phi;
-
+                const lenRatio = book.title.length > 8 ? 0.8 : 1; 
+                el.style.fontSize = `${(0.45 + w/60) * lenRatio}rem`;
+                
+                const phi = Math.acos(-1 + (2 * i) / count); const theta = Math.sqrt(count * Math.PI) * phi;
                 stars.push({
-                    el: el,
-                    x: r * Math.sin(phi) * Math.cos(theta),
-                    y: r * Math.sin(phi) * Math.sin(theta),
-                    z: r * Math.cos(phi),
-                    v: (0.012 + (w * w) / 15000)
+                    el: el, x: r * Math.sin(phi) * Math.cos(theta), y: r * Math.sin(phi) * Math.sin(theta), z: r * Math.cos(phi),
+                    v: (0.012 + (w * w) / 15000) // 维持超频转速
                 });
                 container.appendChild(el);
             });
@@ -129,16 +86,13 @@
 
         function animate() {
             stars.forEach(s => {
-                const cos = Math.cos(s.v);
-                const sin = Math.sin(s.v);
-                const x1 = s.x * cos - s.z * sin;
-                const z1 = s.z * cos + s.x * sin;
+                const cos = Math.cos(s.v); const sin = Math.sin(s.v);
+                const x1 = s.x * cos - s.z * sin; const z1 = s.z * cos + s.x * sin;
                 s.x = x1; s.z = z1;
-                const scale = (s.z + 200) / 400 * 0.5 + 0.5;
-                const opacity = (s.z + 200) / 400 * 0.7 + 0.3;
+                const scale = (s.z + 200) / 450 * 0.5 + 0.5; 
+                const opacity = (s.z + 200) / 450 * 0.7 + 0.2; // 远端更暗
                 s.el.style.transform = `translate3d(${s.x}px, ${s.y}px, ${s.z}px) scale(${scale})`;
-                s.el.style.opacity = opacity;
-                s.el.style.zIndex = Math.floor(s.z + 200);
+                s.el.style.opacity = opacity; s.el.style.zIndex = Math.floor(s.z + 200);
             });
             requestAnimationFrame(animate);
         }
@@ -147,24 +101,18 @@
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
             document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
             const universe = document.getElementById('viewport-universe');
-            
-            if (idx === 1) {
-                universe.style.display = 'block';
-                setTimeout(() => universe.classList.add('active'), 10);
-            } else {
-                universe.classList.remove('active');
-                universe.style.display = 'none';
-                const p = document.getElementById(`panel-${idx}`);
-                if (p) p.classList.add('active');
+            if (idx === 1) { 
+                universe.style.display = 'block'; 
+                setTimeout(() => universe.classList.add('active'), 10); 
+            } else { 
+                universe.classList.remove('active'); universe.style.display = 'none'; 
+                const p = document.getElementById(`panel-${idx}`); if (p) p.classList.add('active'); 
             }
         }
 
         window.onload = () => { fetchCosmosData(); animate(); switchPanel(1); };
-        let sY = 0;
-        window.addEventListener('touchstart', (e)=> sY = e.touches[0].pageY);
-        window.addEventListener('touchend', (e)=>{
-            if(e.changedTouches[0].pageY - sY > 120) fetchCosmosData();
-        });
+        let sY = 0; window.addEventListener('touchstart', (e)=> sY = e.touches[0].pageY);
+        window.addEventListener('touchend', (e)=>{ if(e.changedTouches[0].pageY - sY > 120) fetchCosmosData(); });
         setInterval(()=> { document.getElementById('sync-time').innerText = new Date().toTimeString().substring(0,5); }, 1000);
     </script>
 </body>
