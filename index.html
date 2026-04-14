@@ -3,138 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC宇宙-V18.2-SoftColor</title>
+    <title>KC宇宙-V19.0-TopNav</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: radial-gradient(circle at center, #050c1a 0%, #000000 100%); color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
-        header { position: fixed; top: 0; left: 0; width: 100vw; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
-        h1 { font-size: 1.4rem; letter-spacing: 10px; text-shadow: 0 0 20px rgba(92, 156, 217, 0.5); text-transform: uppercase; opacity: 0.8; }
-        .sync-info { font-size: 0.55rem; color: rgba(255, 255, 255, 0.3); margin-top: 8px; letter-spacing: 1px; }
-        .side-nav { position: fixed; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 200; }
-        .tab-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #555; width: 52px; height: 75px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; border-radius: 12px; writing-mode: vertical-rl; cursor: pointer; transition: 0.4s; backdrop-filter: blur(5px); }
-        .tab-btn.active { color: #fff; border-color: rgba(92, 156, 217, 0.5); background: rgba(92, 156, 217, 0.15); box-shadow: 0 0 15px rgba(92, 156, 217, 0.3); }
+        
+        /* 顶部区域重构 */
+        header { position: fixed; top: 0; left: 0; width: 100vw; padding-top: 15px; display: flex; flex-direction: column; align-items: center; z-index: 200; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
+        h1 { font-size: 1.2rem; letter-spacing: 8px; text-shadow: 0 0 20px rgba(92, 156, 217, 0.4); text-transform: uppercase; opacity: 0.9; }
+        .sync-info { font-size: 0.5rem; color: rgba(255, 255, 255, 0.3); margin-top: 5px; letter-spacing: 1px; }
+
+        /* 顶部横向导航栏 */
+        .top-nav { position: fixed; top: 75px; left: 0; width: 100vw; display: flex; justify-content: center; gap: 8px; padding: 0 10px; z-index: 210; pointer-events: auto; }
+        .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #666; flex: 1; max-width: 85px; height: 35px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: 0.3s; backdrop-filter: blur(10px); }
+        .tab-btn.active { color: #fff; border-color: rgba(92, 156, 217, 0.6); background: rgba(92, 156, 217, 0.2); box-shadow: 0 0 15px rgba(92, 156, 217, 0.2); }
+
+        /* 内容区域 */
         .viewport { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; perspective: 1200px; z-index: 10; display: none; }
         .viewport.active { display: block; }
-        #fuel-intro { position: absolute; top: 115px; left: 50%; transform: translateX(-50%); width: 85%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.8rem; line-height: 1.6; z-index: 5; pointer-events: none; }
-        #fuel-nebula { position: absolute; top: 50%; left: 50%; transform-style: preserve-3d; }
-        .content-panel { position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 85vw; max-height: 70vh; background: transparent; padding: 20px; overflow-y: auto; display: none; z-index: 150; color: #aaa; line-height: 1.8; font-size: 0.95rem; text-shadow: 0 2px 10px rgba(0,0,0,0.9); }
+        #fuel-intro { position: absolute; top: 140px; left: 50%; transform: translateX(-50%); width: 85%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.75rem; line-height: 1.5; z-index: 5; pointer-events: none; }
+        #fuel-nebula { position: absolute; top: 55%; left: 50%; transform-style: preserve-3d; }
+        
+        .content-panel { position: fixed; top: 58%; left: 50%; transform: translate(-50%, -50%); width: 88vw; max-height: 65vh; background: transparent; padding: 20px; overflow-y: auto; display: none; z-index: 150; color: #aaa; line-height: 1.8; font-size: 0.95rem; }
         .content-panel.active { display: block; }
-        .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; transition: opacity 0.3s; }
-        footer { position: fixed; bottom: 12px; width: 100%; text-align: center; font-size: 0.45rem; color: rgba(255, 255, 255, 0.2); letter-spacing: 2px; }
+        
+        .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; }
+        footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.4rem; color: rgba(255, 255, 255, 0.15); letter-spacing: 1px; pointer-events: none; }
         .highlight { color: #5c9cd9; }
     </style>
 </head>
 <body>
-    <header><h1>KC小宇宙</h1><div class="sync-info">STATION_V18.2 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div></header>
-    <div class="viewport" id="viewport-universe"><div id="fuel-intro"></div><div id="fuel-nebula"></div></div>
-    <nav class="side-nav">
+    <header>
+        <h1>KC小宇宙</h1>
+        <div class="sync-info">STATION_V19.0 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
+    </header>
+
+    <nav class="top-nav">
         <div class="tab-btn active" onclick="switchPanel(0)">诞生日</div>
         <div class="tab-btn" onclick="switchPanel(1)">旋转燃料</div>
         <div class="tab-btn" onclick="switchPanel(2)">照亮空间</div>
         <div class="tab-btn" onclick="switchPanel(3)">终极进化</div>
     </nav>
-    <div id="panels-container"><div class="content-panel" id="panel-0"></div><div class="content-panel" id="panel-2"></div><div class="content-panel" id="panel-3"></div></div>
-    <footer>KC_COSMOS_V18.2_SOFT_TURBO</footer>
+
+    <div class="viewport" id="viewport-universe">
+        <div id="fuel-intro"></div>
+        <div id="fuel-nebula"></div>
+    </div>
+
+    <div id="panels-container">
+        <div class="content-panel" id="panel-0"></div>
+        <div class="content-panel" id="panel-2"></div>
+        <div class="content-panel" id="panel-3"></div>
+    </div>
+
+    <footer>KC_COSMOS_V19.0_TOP_LAYOUT</footer>
 
     <script>
         const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
-        // 莫兰迪低饱和度色池
         const morandiPool = ['hsl(190, 20%, 60%)', 'hsl(280, 15%, 65%)', 'hsl(150, 15%, 60%)', 'hsl(35, 25%, 60%)', 'hsl(210, 20%, 65%)', 'hsl(0, 15%, 65%)'];
         let remoteBooks = []; let stars = [];
 
         async function fetchCosmosData() {
-            const statusTag = document.getElementById('sync-status'); statusTag.innerText = "SYNC...";
+            const statusTag = document.getElementById('sync-status');
+            statusTag.innerText = "SYNC...";
             try {
-                const res = await fetch(getUrl()); const data = await res.json();
-                if (data.panels) { data.panels.forEach((item, idx) => {
-                    const p = document.getElementById(`panel-${idx}`); if (p) p.innerHTML = item.content;
-                    if (idx === 1) document.getElementById('fuel-intro').innerHTML = item.content;
-                }); }
+                const res = await fetch(getUrl());
+                const data = await res.json();
+                if (data.panels) {
+                    data.panels.forEach((item, idx) => {
+                        const p = document.getElementById(`panel-${idx}`);
+                        if (p) p.innerHTML = item.content;
+                        if (idx === 1) document.getElementById('fuel-intro').innerHTML = item.content;
+                    });
+                }
                 if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
                 statusTag.innerText = "OK";
             } catch (e) { statusTag.innerText = "OFFLINE"; }
         }
 
-function initStars() {
-    const container = document.getElementById('fuel-nebula');
-    container.innerHTML = ''; stars = [];
-    const count = remoteBooks.length;
-    const r = Math.max(window.innerWidth, window.innerHeight) * 0.45;
-    
-    // 检测是否为移动端，给予速度补偿
-    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-    const speedBoost = isMobile ? 2.5 : 1.0; 
+        function initStars() {
+            const container = document.getElementById('fuel-nebula');
+            container.innerHTML = ''; stars = [];
+            const count = remoteBooks.length;
+            const r = Math.max(window.innerWidth, window.innerHeight) * 0.45;
+            const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+            const speedBoost = isMobile ? 2.5 : 1.0; 
 
-    remoteBooks.forEach((book, i) => {
-        const el = document.createElement('div');
-        el.className = 'star-item';
-        el.innerText = book.title;
-        let val = String(book.uniqueness).replace(/[^0-9.]/g, '');
-        const w = parseFloat(val) || 5;
-        
-        // 颜色逻辑保持 V18.2 的莫兰迪高级感
-        let col;
-        if (w >= 20) { col = "hsl(0, 0%, 95%)"; el.style.textShadow = `0 0 ${w/4}px rgba(255,255,255,0.4)`; } 
-        else if (w >= 18) { col = "hsl(40, 45%, 70%)"; }
-        else if (w >= 10) { col = "hsl(210, 30%, 65%)"; }
-        else { col = morandiPool[i % morandiPool.length]; }
+            remoteBooks.forEach((book, i) => {
+                const el = document.createElement('div');
+                el.className = 'star-item'; el.innerText = book.title;
+                let val = String(book.uniqueness).replace(/[^0-9.]/g, '');
+                const w = parseFloat(val) || 5;
+                
+                let col;
+                if (w >= 20) col = "hsl(0, 0%, 95%)";
+                else if (w >= 18) col = "hsl(0, 50%, 75%)";
+                else if (w >= 10) col = "hsl(210, 30%, 65%)";
+                else col = morandiPool[i % morandiPool.length];
 
-        el.style.color = col;
-        const lenRatio = book.title.length > 8 ? 0.75 : 1; 
-        el.style.fontSize = `${(0.42 + w/65) * lenRatio}rem`;
-        
-        const phi = Math.acos(-1 + (2 * i) / count);
-        const theta = Math.sqrt(count * Math.PI) * phi;
-        
-        stars.push({
-            el: el,
-            x: r * Math.sin(phi) * Math.cos(theta),
-            y: r * Math.sin(phi) * Math.sin(theta),
-            z: r * Math.cos(phi),
-            // 手机版超频公式：基础值大幅度拉升
-            v: (0.02 + (w * w) / 8000) * speedBoost 
-        });
-        container.appendChild(el);
-    });
-}
+                el.style.color = col;
+                const lenRatio = book.title.length > 8 ? 0.7 : 1; 
+                el.style.fontSize = `${(0.38 + w/35) * lenRatio}rem`;
+                
+                const phi = Math.acos(-1 + (2 * i) / count);
+                const theta = Math.sqrt(count * Math.PI) * phi;
+                
+                stars.push({
+                    el: el, x: r * Math.sin(phi) * Math.cos(theta), y: r * Math.sin(phi) * Math.sin(theta), z: r * Math.cos(phi),
+                    v: (0.022 + (w * w) / 8000) * speedBoost 
+                });
+                container.appendChild(el);
+            });
+        }
 
-function animate() {
-    stars.forEach((s, idx) => {
-        // --- 核心逻辑：给每颗星分配一个基于索引的固定轨道偏角 ---
-        // 使用 sin(idx) 产生一个 -0.5 到 0.5 之间的固定偏角，保证每本书轨迹不同但稳定
-        const tilt = Math.sin(idx) * 0.4; 
-        
-        const cosV = Math.cos(s.v);
-        const sinV = Math.sin(s.v);
-
-        // 复杂的 3D 旋转：不再只是绕着 Y 轴转
-        // 我们引入 tilt 让 X、Y、Z 三轴同时产生位移变化
-        const x1 = s.x * cosV - s.z * sinV;
-        const z1 = s.z * cosV + s.x * sinV;
-        const y1 = s.y + (s.x * sinV + s.z * (1 - cosV)) * tilt;
-
-        s.x = x1;
-        s.z = z1;
-        s.y = y1 * 0.998; // 极其微弱的向圆心收拢，防止文字飞离中心
-
-        // 渲染逻辑
-        const scale = (s.z + 200) / 450 * 0.6 + 0.4;
-        const opacity = (s.z + 200) / 450 * 0.7 + 0.2;
-
-        s.el.style.transform = `translate3d(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px, ${s.z.toFixed(1)}px) scale(${scale.toFixed(2)})`;
-        s.el.style.opacity = opacity;
-        s.el.style.zIndex = Math.floor(s.z + 200);
-    });
-    requestAnimationFrame(animate);
-}
+        function animate() {
+            stars.forEach((s, idx) => {
+                const tilt = Math.sin(idx) * 0.35;
+                const cosV = Math.cos(s.v); const sinV = Math.sin(s.v);
+                const x1 = s.x * cosV - s.z * sinV;
+                const z1 = s.z * cosV + s.x * sinV;
+                const y1 = s.y + (s.x * sinV) * tilt;
+                s.x = x1; s.z = z1; s.y = y1 * 0.998;
+                const scale = (s.z + 200) / 450 * 0.6 + 0.4;
+                const opacity = (s.z + 200) / 450 * 0.7 + 0.2;
+                s.el.style.transform = `translate3d(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px, ${s.z.toFixed(1)}px) scale(${scale.toFixed(2)})`;
+                s.el.style.opacity = opacity;
+                s.el.style.zIndex = Math.floor(s.z + 200);
+            });
+            requestAnimationFrame(animate);
+        }
 
         function switchPanel(idx) {
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
             document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
             const universe = document.getElementById('viewport-universe');
             if (idx === 1) { 
-                universe.style.display = 'block'; 
-                setTimeout(() => universe.classList.add('active'), 10); 
+                universe.style.display = 'block'; setTimeout(() => universe.classList.add('active'), 10); 
             } else { 
                 universe.classList.remove('active'); universe.style.display = 'none'; 
                 const p = document.getElementById(`panel-${idx}`); if (p) p.classList.add('active'); 
