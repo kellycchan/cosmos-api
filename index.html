@@ -7,42 +7,38 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
-        
-        /* 背景：确保中心微亮，防止死黑撞色 */
         .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at center, #0a1b3d 0%, #000000 100%); }
-
         header { position: fixed; top: 0; left: 0; width: 100vw; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
         h1 { font-size: 1.4rem; letter-spacing: 10px; text-shadow: 0 0 20px #5c9cd9; text-transform: uppercase; }
         .sync-info { font-size: 0.5rem; color: #444; margin-top: 8px; letter-spacing: 2px; }
-        
         .container { display: flex; height: 100vh; width: 100vw; align-items: center; justify-content: center; transform: translateY(20px); }
         .side-nav { position: absolute; left: 15px; display: flex; flex-direction: column; gap: 12px; z-index: 10; }
-        .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #555; width: 60px; height: 85px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; border-radius: 20px; writing-mode: vertical-rl; }
+        .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #555; width: 60px; height: 85px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; border-radius: 20px; writing-mode: vertical-rl; transition: 0.4s; }
         .tab-btn.active { color: #fff; border-color: #5c9cd9; background: rgba(92, 156, 217, 0.2); box-shadow: 0 0 15px #5c9cd9; }
-        
         .main-content { width: 300px; height: 480px; position: relative; perspective: 1200px; }
         .display-screen { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); height: 100%; width: 100%; border-radius: 20px; overflow: hidden; position: relative; }
-        
-        /* 核心修复：保持 3D 结构，半径调优 */
         #fuel-nebula { position: absolute; top: 50%; left: 50%; width: 1px; height: 1px; transform-style: preserve-3d; }
-        .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; }
+        .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; transition: color 0.4s; }
+        footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.4rem; opacity: 0.2; }
     </style>
 </head>
 <body>
     <div class="space-bg"></div>
     <header>
         <h1>KC小宇宙</h1>
-        <div class="sync-info">STATION_V16.9 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
+        <div class="sync-info">CORE_DIM: 11D | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
     </header>
     <div class="container" id="touch-area">
         <nav class="side-nav"><div class="tab-btn active">旋转燃料</div></nav>
         <main class="main-content"><div class="display-screen"><div id="fuel-nebula"></div></div></main>
     </div>
+    <footer>V16.9 ULTIMATE</footer>
 
     <script>
         const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
-        // 10分以下彩色池：剔除所有暗色
         const brightPool = ['#a0e9ff', '#ffb7ff', '#98ff98', '#ffcc80', '#e0f7fa', '#81d8d0'];
+        let remoteBooks = [];
+        let stars = [];
 
         async function fetchCosmosData() {
             const statusTag = document.getElementById('sync-status');
@@ -60,33 +56,30 @@
             container.innerHTML = '';
             stars = [];
             const count = remoteBooks.length;
-
             remoteBooks.forEach((book, i) => {
                 const el = document.createElement('div');
                 el.className = 'star-item';
                 el.innerText = book.title;
 
-                // --- 逻辑核武器：严格按照你的阀值判定 ---
+                // 核心逻辑清洗：彻底消除“薛兆丰变白”的可能性
                 let rawVal = String(book.uniqueness).replace(/[^0-9.]/g, ''); 
                 const w = parseFloat(rawVal) || 5;
                 
                 let col;
-                if (w >= 20) { col = "#ffffff"; }      // 20: 纯白
-                else if (w >= 19) { col = "#ffd54f"; } // 19: 黄色
-                else if (w >= 18) { col = "#ff5252"; } // 18: 红色
-                else if (w >= 10) { col = "#5c9cd9"; } // 10-17: 蓝色
-                else { col = brightPool[i % brightPool.length]; } // 10以下: 彩色
+                if (w >= 20) col = "#ffffff";
+                else if (w >= 19) col = "#ffd54f";
+                else if (w >= 18) col = "#ff5252";
+                else if (w >= 10) col = "#5c9cd9";
+                else col = brightPool[i % brightPool.length];
 
                 el.style.color = col;
-                el.style.textShadow = `0 0 ${3 + w/5}px ${col}`;
-                
-                // 防止书名太长重叠：长标题缩放
-                const lenRatio = book.title.length > 8 ? 0.8 : 1;
-                el.style.fontSize = `${(0.45 + w/55) * lenRatio}rem`;
+                el.style.textShadow = `0 0 ${4 + w/4}px ${col}`;
+                const lenRatio = book.title.length > 8 ? 0.82 : 1;
+                el.style.fontSize = `${(0.46 + w/50) * lenRatio}rem`;
 
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                const r = 160; // 核心半径，恢复球体感
+                const r = 160; 
 
                 stars.push({
                     el: el,
@@ -116,8 +109,9 @@
         }
 
         let sY = 0;
-        document.getElementById('touch-area').addEventListener('touchstart', (e)=> sY = e.touches[0].pageY);
-        document.getElementById('touch-area').addEventListener('touchend', (e)=>{
+        const touchArea = document.getElementById('touch-area');
+        touchArea.addEventListener('touchstart', (e)=> sY = e.touches[0].pageY);
+        touchArea.addEventListener('touchend', (e)=>{
             if(e.changedTouches[0].pageY - sY > 120) fetchCosmosData();
         });
 
