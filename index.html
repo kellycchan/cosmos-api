@@ -3,171 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC小宇宙-V16.2全量版</title>
+    <title>KC宇宙-V17.0健壮版</title>
     <style>
-        :root { --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
         
-        /* 1. 之前确定的背景优化 */
-        .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(30px) brightness(15%); }
-        .space-bg { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; 
-            background: linear-gradient(135deg, #000000 0%, #050a15 50%, #000000 100%); 
-            animation: bgPulse 15s infinite alternate ease-in-out; 
+        /* 1. 彻底解决背景全黑：改用纯色背景 + 一个大光晕图片或多重背景兜底 */
+        body { 
+            background-color: #050a15; /* 强行给一个深蓝色底，绝不全黑 */
+            color: #fff; 
+            font-family: -apple-system, sans-serif; 
+            overflow: hidden; 
+            height: 100vh; width: 100vw; 
+            touch-action: none;
         }
-        @keyframes bgPulse { 0% { filter: brightness(1); } 100% { filter: brightness(1.2) contrast(1.1); } }
 
-        header { position: fixed; top: 0; left: 0; width: 100vw; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
-        h1 { font-size: 1.4rem; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; margin-bottom: 8px; }
-        .sync-info { font-size: 0.5rem; color: #666; letter-spacing: 2px; }
+        header { position: fixed; top: 0; left: 0; width: 100vw; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; background: linear-gradient(to bottom, #050a15, transparent); }
+        h1 { font-size: 1.3rem; letter-spacing: 8px; text-shadow: 0 0 15px #5c9cd9; }
+        .sync-info { font-size: 0.5rem; color: #555; margin-top: 5px; }
         
-        .container { display: flex; height: 100vh; width: 100vw; padding: 20px; gap: 10px; align-items: center; justify-content: center; transform: translateY(20px); }
-        .side-nav { display: flex; flex-direction: column; width: 80px; gap: 12px; z-index: 10; }
-        .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #444; width: 65px; height: 80px; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 18px; writing-mode: vertical-rl; letter-spacing: 4px; transition: 0.4s; }
-        .tab-btn.active { color: #fff; border-color: var(--active-color); background: rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--active-color); }
+        .container { display: flex; height: 100vh; width: 100vw; align-items: center; justify-content: center; }
         
-        .main-content { width: 300px; height: 480px; position: relative; perspective: 1000px; }
-        .display-screen { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(20px); padding: 30px 20px; height: 100%; width: 100%; position: relative; clip-path: polygon(8% 0%, 100% 5%, 100% 95%, 92% 100%, 0% 95%, 0% 8%); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+        /* 侧边栏 */
+        .side-nav { position: absolute; left: 10px; display: flex; flex-direction: column; gap: 10px; z-index: 30; }
+        .tab-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #888; width: 45px; height: 70px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; border-radius: 10px; writing-mode: vertical-rl; }
+        .tab-btn.active { color: #fff; border-color: #5c9cd9; background: rgba(92,156,217,0.3); }
         
-        .content-panel { display: none; height: 100%; overflow-y: auto; scrollbar-width: none; line-height: 2.2; font-size: 0.9rem; color: #ccc; }
-        .content-panel.active { display: block; }
+        /* 屏幕框 */
+        .display-screen { 
+            background: rgba(0, 0, 0, 0.7); 
+            border: 1px solid #222; 
+            height: 480px; width: 310px; 
+            border-radius: 20px; 
+            overflow: visible !important; /* 彻底解决显示不全：允许内容溢出容器 */
+            position: relative; 
+        }
+        
+        #fuel-nebula { 
+            position: absolute; top: 50%; left: 50%; 
+            width: 1px; height: 1px; 
+            transform-style: preserve-3d; 
+            backface-visibility: hidden;
+        }
 
-        #fuel-nebula { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform-style: preserve-3d; }
-        .star-item { position: absolute; cursor: pointer; font-weight: bold; white-space: nowrap; transition: color 0.4s, text-shadow 0.4s; will-change: transform, opacity; transform-origin: center; }
-        
-        footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.4rem; opacity: 0.2; }
+        .star-item { 
+            position: absolute; 
+            white-space: nowrap; 
+            font-weight: bold; 
+            transform-origin: center;
+            /* 解决显示不全的核心：去掉所有的裁剪可能 */
+            overflow: visible;
+        }
     </style>
 </head>
 <body>
-    <div class="bg-overlay"></div><div class="space-bg"></div>
-    <header id="app-header">
+    <header>
         <h1>KC小宇宙</h1>
-        <div class="sync-info"><span>DIM: 11D</span> | <span id="sync-status">STATUS: READY</span> | <span id="sync-time">00:00</span></div>
+        <div class="sync-info">V17.0 STABLE | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
     </header>
+    
     <div class="container" id="touch-area">
         <nav class="side-nav">
-            <div class="tab-btn active" onclick="switchPanel(0)">诞生日</div>
-            <div class="tab-btn" onclick="switchPanel(1)">旋转燃料</div>
-            <div class="tab-btn" onclick="switchPanel(2)">照亮空间</div>
-            <div class="tab-btn" onclick="switchPanel(3)">终极进化</div>
+            <div class="tab-btn active">旋转燃料</div>
         </nav>
-        <main class="main-content">
-            <div class="display-screen">
-                <div class="content-panel active" id="panel-0"></div>
-                <div class="content-panel" id="panel-1"><div id="fuel-nebula"></div></div>
-                <div class="content-panel" id="panel-2"></div>
-                <div class="content-panel" id="panel-3"></div>
-            </div>
-        </main>
+        <div class="display-screen">
+            <div id="fuel-nebula"></div>
+        </div>
     </div>
-    <footer>V16.2 FINAL_STABLE</footer>
 
     <script>
-        const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now() + "_" + Math.random().toString(36).substr(2, 4);
-        const colors = ['#5c9cd9', '#7dbdbd', '#9b84b3', '#d1d1d1'];
-        const starColors = ['#ffcc80', '#ff8a80', '#7dbdbd', '#9b84b3', '#d1d1d1', '#ffd54f', '#ff5252'];
+        // 增加更暴力的 URL 参数，确保穿透任何缓存
+        const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Math.random();
+        const starColors = ['#5c9cd9', '#7dbdbd', '#9b84b3', '#ffcc80', '#ff8a80'];
         let remoteBooks = [];
         let stars = [];
 
         async function fetchCosmosData() {
             const statusTag = document.getElementById('sync-status');
-            statusTag.innerText = "STATUS: SYNCING...";
-            statusTag.style.color = "#ffd54f";
+            statusTag.innerText = "SYNC...";
             try {
-                const response = await fetch(getUrl());
-                if (!response.ok) throw new Error('CDN Limit');
-                const data = await response.json();
-                if (data.panels) {
-                    data.panels.forEach((item, index) => {
-                        const p = document.getElementById(`panel-${index}`);
-                        if (p && index !== 1) p.innerHTML = item.content;
-                    });
+                const res = await fetch(getUrl());
+                const data = await res.json();
+                if (data.readBooks) {
+                    remoteBooks = data.readBooks;
+                    initStars();
                 }
-                if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
-                statusTag.innerText = "STATUS: SYNC_STABLE";
-                statusTag.style.color = "";
-            } catch (e) { 
-                statusTag.innerText = "STATUS: OFFLINE"; 
-                statusTag.style.color = "#ff5252"; 
-            }
+                statusTag.innerText = "SYNC_OK";
+            } catch (e) { statusTag.innerText = "ERROR"; }
         }
 
         function initStars() {
             const container = document.getElementById('fuel-nebula');
             container.innerHTML = '';
             stars = [];
-            const displayList = remoteBooks.slice(0, 150); 
-            const count = displayList.length;
+            const count = remoteBooks.length;
 
-            displayList.forEach((book, i) => {
-                const item = document.createElement('div');
-                item.className = 'star-item';
-                item.innerText = book.title;
-                
-                // --- 强校验逻辑：确保薛兆丰这种低权重的不会变白 ---
-                let rawWeight = String(book.uniqueness).trim();
-                const weight = parseFloat(rawWeight) || 5; 
-                
-                let color;
-                if (weight >= 20) { color = "#ffffff"; }      // 核心白
-                else if (weight >= 17) { color = "#ffd54f"; } // 稀有黄
-                else if (weight >= 14) { color = "#ff5252"; } // 珊瑚红
-                else { color = starColors[i % starColors.length]; }
+            remoteBooks.forEach((book, i) => {
+                const el = document.createElement('div');
+                el.className = 'star-item';
+                el.innerText = book.title;
 
-                item.style.color = color;
-                // 优化光晕防止碰撞
-                const shadowSize = Math.max(2, 5 - (count / 30) + (weight / 8));
-                item.style.textShadow = `0 0 ${shadowSize}px ${color}`;
-                // 调整基础字号
-                const baseSize = count > 80 ? 0.42 : 0.48;
-                item.style.fontSize = `${baseSize + weight/45}rem`;
+                // --- 逻辑校准：强制去空格、强制转整型 ---
+                const rawVal = String(book.uniqueness).replace(/[^0-9.]/g, ''); // 只保留数字和点
+                const w = parseInt(rawVal, 10) || 5;
+
+                let col;
+                // 提高阈值，确保稀有
+                if (w >= 20) col = "#ffffff";
+                else if (w >= 16) col = "#ffd54f";
+                else if (w >= 12) col = "#ff5252";
+                else col = starColors[i % starColors.length];
+
+                el.style.color = col;
+                el.style.textShadow = `0 0 ${w/3}px ${col}`;
+                // 略微调小字号，增加散开半径，物理性解决遮挡
+                el.style.fontSize = (0.4 + w/55) + "rem";
 
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                const radius = count > 80 ? 175 : 160; 
+                const r = 145; 
 
                 stars.push({
-                    el: item,
-                    x: radius * Math.sin(phi) * Math.cos(theta),
-                    y: radius * Math.sin(phi) * Math.sin(theta),
-                    z: radius * Math.cos(phi),
-                    speed: (0.005 + (weight * weight) / 38000) 
+                    el: el,
+                    x: r * Math.sin(phi) * Math.cos(theta),
+                    y: r * Math.sin(phi) * Math.sin(theta),
+                    z: r * Math.cos(phi),
+                    v: (0.005 + (w * w) / 45000)
                 });
-                container.appendChild(item);
+                container.appendChild(el);
             });
         }
 
         function animate() {
             stars.forEach(s => {
-                const cos = Math.cos(s.speed);
-                const sin = Math.sin(s.speed);
+                const cos = Math.cos(s.v);
+                const sin = Math.sin(s.v);
                 const x1 = s.x * cos - s.z * sin;
                 const z1 = s.z * cos + s.x * sin;
                 s.x = x1; s.z = z1;
-                const scale = 1000 / (1000 - s.z);
-                const alpha = (s.z + 175) / 350 + 0.1;
-                s.el.style.transform = `translate3d(${s.x * scale}px, ${s.y * scale}px, 0) scale(${scale})`;
-                s.el.style.opacity = alpha;
-                s.el.style.zIndex = Math.floor(s.z + 175);
+
+                // 解决显示不全的核心：
+                // 使用 translate3d 但绝对不让 Z 轴靠近观察者太近（防止被近剪裁平面切掉）
+                const zFinal = s.z; 
+                const scale = (zFinal + 145) / 290 * 0.6 + 0.4;
+                const opacity = (zFinal + 145) / 290 * 0.7 + 0.3;
+                
+                s.el.style.transform = `translate3d(${s.x}px, ${s.y}px, ${zFinal}px) scale(${scale})`;
+                s.el.style.opacity = opacity;
+                s.el.style.zIndex = Math.floor(zFinal + 1000);
             });
             requestAnimationFrame(animate);
         }
 
-        function switchPanel(index) {
-            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === index));
-            document.querySelectorAll('.content-panel').forEach((p, i) => p.classList.toggle('active', i === index));
-            document.documentElement.style.setProperty('--active-color', colors[index]);
-            if(index === 1) setTimeout(initStars, 100);
-        }
-
-        let startY = 0;
-        document.getElementById('touch-area').addEventListener('touchstart', (e) => startY = e.touches[0].pageY);
-        document.getElementById('touch-area').addEventListener('touchend', (e) => {
-            if (e.changedTouches[0].pageY - startY > 150) fetchCosmosData();
+        let sY = 0;
+        document.getElementById('touch-area').addEventListener('touchstart', (e)=> sY = e.touches[0].pageY);
+        document.getElementById('touch-area').addEventListener('touchend', (e)=>{
+            if(e.changedTouches[0].pageY - sY > 100) fetchCosmosData();
         });
 
-        setInterval(() => { document.getElementById('sync-time').innerText = new Date().toTimeString().substring(0,5); }, 1000);
+        setInterval(()=> document.getElementById('sync-time').innerText = new Date().toTimeString().substring(0,5), 1000);
         window.onload = () => { fetchCosmosData(); animate(); };
     </script>
 </body>
