@@ -50,8 +50,21 @@
     { "title": "时生", "uniqueness": 3 },
     { "title": "白鸟与蝙蝠", "uniqueness": 6 },
     { "title": "1988我想和这个世界谈谈", "uniqueness": 20 },
-    { "title": "一座城池", "uniqueness": 17 }
-    
+    { "title": "读库", "uniqueness": 10 },
+    { "title": "看上去很美", "uniqueness": 15 },
+    { "title": "红拂夜奔", "uniqueness": 10 },
+    { "title": "白银时代", "uniqueness": 12 },
+    { "title": "一只特立独行的猪", "uniqueness": 13 },
+    { "title": "手机里的男朋友", "uniqueness": 7 },
+    { "title": "女王乔安", "uniqueness": 6 },
+    { "title": "谢谢自己够勇敢", "uniqueness": 1 },
+    { "title": "皮囊", "uniqueness": 8 },
+    { "title": "世界上所有童话都是写给大人看的", "uniqueness": 5 },
+    { "title": "薛兆丰经济学讲义", "uniqueness": 7 },
+    { "title": "别做梦了I have a dream", "uniqueness": 7 },
+    { "title": "睡不着", "uniqueness": 3 },
+    { "title": "再见企鹅", "uniqueness": 2 },
+    { "title": "直到世界尽头", "uniqueness": 1 }
     
   ]
 }
