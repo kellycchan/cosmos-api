@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC小宇宙-绚丽星空版</title>
+    <title>KC小宇宙-V16.1验收版</title>
     <style>
         :root { --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
-        .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(25px) brightness(15%); }
-        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 0.3) 0%, rgba(0, 0, 0, 1) 100%); }
+        .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(30px) brightness(15%); }
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: linear-gradient(135deg, #000000 0%, #050a15 50%, #000000 100%); animation: bgPulse 15s infinite alternate ease-in-out; }
+        @keyframes bgPulse { 0% { filter: brightness(1); } 100% { filter: brightness(1.2) contrast(1.1); } }
         header { position: fixed; top: 0; left: 0; width: 100vw; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
         h1 { font-size: 1.4rem; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; margin-bottom: 8px; }
-        .sync-info { font-size: 0.5rem; color: #444; letter-spacing: 2px; }
+        .sync-info { font-size: 0.5rem; color: #666; letter-spacing: 2px; }
         .container { display: flex; height: 100vh; width: 100vw; padding: 20px; gap: 10px; align-items: center; justify-content: center; transform: translateY(20px); }
         .side-nav { display: flex; flex-direction: column; width: 80px; gap: 12px; z-index: 10; }
         .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #444; width: 65px; height: 80px; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 18px; writing-mode: vertical-rl; letter-spacing: 4px; transition: 0.4s; }
@@ -48,12 +49,11 @@
             </div>
         </main>
     </div>
-    <footer>V15.6 SPECTRUM_ENGINE</footer>
+    <footer>CORE // K_STATION_V16.1</footer>
 
     <script>
-        const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
+        const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now() + "_" + Math.random().toString(36).substr(2, 4);
         const colors = ['#5c9cd9', '#7dbdbd', '#9b84b3', '#d1d1d1'];
-        // 扩展调色盘：加入黄、红、橙
         const starColors = ['#ffcc80', '#ff8a80', '#7dbdbd', '#9b84b3', '#d1d1d1', '#ffd54f', '#ff5252'];
         let remoteBooks = [];
         let stars = [];
@@ -61,8 +61,10 @@
         async function fetchCosmosData() {
             const statusTag = document.getElementById('sync-status');
             statusTag.innerText = "STATUS: SYNCING...";
+            statusTag.style.color = "#ffd54f";
             try {
                 const response = await fetch(getUrl());
+                if (!response.ok) throw new Error('CDN Limit');
                 const data = await response.json();
                 if (data.panels) {
                     data.panels.forEach((item, index) => {
@@ -72,52 +74,59 @@
                 }
                 if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
                 statusTag.innerText = "STATUS: SYNC_STABLE";
-            } catch (e) { statusTag.innerText = "STATUS: OFFLINE"; }
+                statusTag.style.color = "";
+            } catch (e) { statusTag.innerText = "STATUS: OFFLINE"; statusTag.style.color = "#ff5252"; }
         }
-      function initStars() {
+
+        function initStars() {
             const container = document.getElementById('fuel-nebula');
             container.innerHTML = '';
             stars = [];
-            
-            // 为了保证手机性能，如果超过 120 本则截断，防止渲染压力过大导致发烫
-            const displayList = remoteBooks.slice(0, 120); 
+            // 容量截断，防止数据爆炸
+            const displayList = remoteBooks.slice(0, 150); 
             const count = displayList.length;
 
             displayList.forEach((book, i) => {
                 const item = document.createElement('div');
                 item.className = 'star-item';
                 item.innerText = book.title;
-                const weight = book.uniqueness || 5;
                 
-                /* * [权重光谱参考]
-                 * 18-20: #ffffff (纯白) - 核心恒星，极速
-                 * 14-17: #ffd54f (琥珀黄) - 活跃行星，快速
-                 * 10-13: #ff5252 (珊瑚红) - 焦点星体，中速
-                 * 01-09: starColors (冷色系) - 基础星尘，慢速
-                 */
+                // --- V16.1 极致验收：再次向上调整阶梯阈值 ---
+                const weight = Number(book.uniqueness) || 5; 
                 let color;
-                if (weight >= 18) { color = "#ffffff"; } 
-                else if (weight >= 14) { color = "#ffd54f"; } 
-                else if (weight >= 10) { color = "#ff5252"; } 
-                else { color = starColors[i % starColors.length]; }
+                
+                if (weight >= 20) { 
+                    color = "#ffffff"; // 仅限 20 分：核心纯白
+                } else if (weight >= 17) { 
+                    color = "#ffd54f"; // 17-19 分：极稀有琥珀黄（你的《阿西莫夫》16分此时为彩色 ✅）
+                } else if (weight >= 14) { 
+                    color = "#ff5252"; // 14-16 分：中高红（你的《基地》12分此时为彩色 ✅）
+                } else { 
+                    color = starColors[i % starColors.length]; // 其余彩色背景
+                }
 
                 item.style.color = color;
-                // 优化后的发光逻辑：权重越高，光晕越柔和分散
-                item.style.textShadow = `0 0 ${6 + weight/3}px ${color}`;
-                item.style.fontSize = `${0.45 + weight/45}rem`;
+                // 修复发光导致的碰撞：根据数据量和权重，动态调小光晕
+                const shadowSize = Math.max(2, 6 - (count / 25) + (weight / 6));
+                item.style.textShadow = `0 0 ${shadowSize}px ${color}`;
+                // 字号容错优化，防止长书名爆炸
+                const baseSize = count > 80 ? 0.42 : 0.48;
+                item.style.fontSize = `${baseSize + weight/45}rem`;
 
-                // 物理分布算法
+                // --- 物理算法优化：修复空间碰撞 ---
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                const radius = 160; 
+                
+                // 动态拉大半径：根据数据量，强制书名散开
+                const radius = count > 80 ? 175 : 160; 
 
                 stars.push({
                     el: item,
                     x: radius * Math.sin(phi) * Math.cos(theta),
                     y: radius * Math.sin(phi) * Math.sin(theta),
                     z: radius * Math.cos(phi),
-                    // 能量关联速度公式：(0.006 为基准，权重每加 1 提升 0.0008 的动能)
-                    speed: (0.006 + weight / 1250)
+                    // 平方级速度差依然保留，动感更强
+                    speed: (0.005 + (weight * weight) / 35000) 
                 });
                 container.appendChild(item);
             });
@@ -129,14 +138,12 @@
                 const sin = Math.sin(s.speed);
                 const x1 = s.x * cos - s.z * sin;
                 const z1 = s.z * cos + s.x * sin;
-                s.x = x1;
-                s.z = z1;
-
+                s.x = x1; s.z = z1;
                 const scale = 1000 / (1000 - s.z);
-                const alpha = (s.z + 160) / 320 + 0.2;
+                const alpha = (s.z + 175) / 350 + 0.1;
                 s.el.style.transform = `translate3d(${s.x * scale}px, ${s.y * scale}px, 0) scale(${scale})`;
                 s.el.style.opacity = alpha;
-                s.el.style.zIndex = Math.floor(s.z + 160);
+                s.el.style.zIndex = Math.floor(s.z + 175);
             });
             requestAnimationFrame(animate);
         }
@@ -145,13 +152,18 @@
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === index));
             document.querySelectorAll('.content-panel').forEach((p, i) => p.classList.toggle('active', i === index));
             document.documentElement.style.setProperty('--active-color', colors[index]);
-            if(index === 1) initStars();
+            if(index === 1) setTimeout(initStars, 100);
         }
 
+        // --- 集成下拉刷新监听 ---
         let startY = 0;
-        document.getElementById('touch-area').addEventListener('touchstart', (e) => startY = e.touches[0].pageY);
-        document.getElementById('touch-area').addEventListener('touchend', (e) => {
-            if (e.changedTouches[0].pageY - startY > 150) fetchCosmosData();
+        const touchArea = document.getElementById('touch-area');
+        touchArea.addEventListener('touchstart', (e) => startY = e.touches[0].pageY);
+        touchArea.addEventListener('touchend', (e) => {
+            const endY = e.changedTouches[0].pageY;
+            if (endY - startY > 150) { 
+                fetchCosmosData(); // 触发无感同步
+            }
         });
 
         setInterval(() => { document.getElementById('sync-time').innerText = new Date().toTimeString().substring(0,5); }, 1000);
