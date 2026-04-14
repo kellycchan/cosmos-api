@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC宇宙-V17.6</title>
+    <title>KC宇宙-V18.0</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -13,41 +13,44 @@
         
         header { position: fixed; top: 0; left: 0; width: 100vw; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
         h1 { font-size: 1.4rem; letter-spacing: 10px; text-shadow: 0 0 20px #5c9cd9; text-transform: uppercase; }
-        .sync-info { font-size: 0.5rem; color: #444; margin-top: 5px; }
+        .sync-info { font-size: 0.55rem; color: rgba(255, 255, 255, 0.5); margin-top: 8px; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         
         .side-nav { position: fixed; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 200; }
-        .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #555; width: 55px; height: 75px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; border-radius: 15px; writing-mode: vertical-rl; cursor: pointer; transition: 0.4s; backdrop-filter: blur(5px); }
+        .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #777; width: 55px; height: 75px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; border-radius: 15px; writing-mode: vertical-rl; cursor: pointer; transition: 0.4s; backdrop-filter: blur(5px); }
         .tab-btn.active { color: #fff; border-color: #5c9cd9; background: rgba(92, 156, 217, 0.2); box-shadow: 0 0 15px #5c9cd9; }
         
-        /* 视口与球体：占满全屏 */
-        .viewport { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; perspective: 1000px; z-index: 10; visibility: hidden; opacity: 0; transition: 0.5s; }
-        .viewport.active { visibility: visible; opacity: 1; }
+        .viewport { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; perspective: 1000px; z-index: 10; display: none; }
+        .viewport.active { display: block; }
+        
+        /* 旋转燃料文案放置区域 */
+        #fuel-intro { position: absolute; top: 110px; left: 50%; transform: translateX(-50%); width: 80%; text-align: center; color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.6; z-index: 5; pointer-events: none; }
+        
         #fuel-nebula { position: absolute; top: 50%; left: 50%; transform-style: preserve-3d; }
         
-        /* 内容面板：层级最高，背景加深 */
-        .content-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 85vw; max-height: 60vh; background: rgba(0,0,0,0.85); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; overflow-y: auto; display: none; z-index: 150; backdrop-filter: blur(25px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .content-panel.active { display: block; animation: panelIn 0.3s ease-out; }
-        @keyframes panelIn { from { opacity: 0; transform: translate(-50%, -45%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+        /* 核心改动：去掉所有黑框和边框，文字直接悬浮 */
+        .content-panel { position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 85vw; max-height: 70vh; background: transparent; border: none; padding: 20px; overflow-y: auto; display: none; z-index: 150; color: #ccc; line-height: 1.8; font-size: 0.95rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .content-panel.active { display: block; }
         
         .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; }
-        footer { position: fixed; bottom: 8px; width: 100%; text-align: center; font-size: 0.4rem; opacity: 0.2; pointer-events: none; }
+        footer { position: fixed; bottom: 12px; width: 100%; text-align: center; font-size: 0.45rem; color: rgba(255, 255, 255, 0.4); letter-spacing: 2px; pointer-events: none; }
     </style>
 </head>
 <body>
     <header>
         <h1>KC小宇宙</h1>
-        <div class="sync-info">STATION_V17.6 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
+        <div class="sync-info">STATION_V18.0 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
     </header>
 
     <div class="viewport" id="viewport-universe">
+        <div id="fuel-intro"></div>
         <div id="fuel-nebula"></div>
     </div>
 
     <nav class="side-nav">
-        <div class="tab-btn active" onclick="switchPanel(0)">诞生</div>
-        <div class="tab-btn" onclick="switchPanel(1)">燃料</div>
-        <div class="tab-btn" onclick="switchPanel(2)">空间</div>
-        <div class="tab-btn" onclick="switchPanel(3)">进化</div>
+        <div class="tab-btn active" onclick="switchPanel(0)">诞生日</div>
+        <div class="tab-btn" onclick="switchPanel(1)">旋转燃料</div>
+        <div class="tab-btn" onclick="switchPanel(2)">照亮空间</div>
+        <div class="tab-btn" onclick="switchPanel(3)">终极进化</div>
     </nav>
 
     <div id="panels-container">
@@ -55,6 +58,8 @@
         <div class="content-panel" id="panel-2"></div>
         <div class="content-panel" id="panel-3"></div>
     </div>
+
+    <footer>KC_COSMOS_V18.0_ULTRA_CLEAN</footer>
 
     <script>
         const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
@@ -72,6 +77,8 @@
                     data.panels.forEach((item, idx) => {
                         const p = document.getElementById(`panel-${idx}`);
                         if (p) p.innerHTML = item.content;
+                        // 特殊处理：把原本 panel-1 的内容提取到旋转界面的 intro 区
+                        if (idx === 1) document.getElementById('fuel-intro').innerHTML = item.content;
                     });
                 }
                 if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
@@ -84,9 +91,7 @@
             container.innerHTML = '';
             stars = [];
             const count = remoteBooks.length;
-            
-            // 空间优化：加大分布半径
-            const rBase = Math.min(window.innerWidth, window.innerHeight) * 0.45;
+            const r = Math.max(window.innerWidth, window.innerHeight) * 0.42;
 
             remoteBooks.forEach((book, i) => {
                 const el = document.createElement('div');
@@ -104,18 +109,18 @@
                 else col = brightPool[i % brightPool.length];
 
                 el.style.color = col;
-                el.style.textShadow = `0 0 ${w/2.5}px ${col}`;
-                const lenRatio = book.title.length > 8 ? 0.8 : 1;
-                el.style.fontSize = `${(0.48 + w/45) * lenRatio}rem`;
+                el.style.textShadow = `0 0 ${w/3}px ${col}`;
+                const lenRatio = book.title.length > 8 ? 0.85 : 1;
+                el.style.fontSize = `${(0.48 + w/50) * lenRatio}rem`;
 
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
 
                 stars.push({
                     el: el,
-                    x: rBase * Math.sin(phi) * Math.cos(theta),
-                    y: (rBase * 1.2) * Math.sin(phi) * Math.sin(theta), // 纵向稍微拉长，填补上下空间
-                    z: rBase * Math.cos(phi),
+                    x: r * Math.sin(phi) * Math.cos(theta),
+                    y: r * Math.sin(phi) * Math.sin(theta),
+                    z: r * Math.cos(phi),
                     v: (0.0055 + (w * w) / 40000)
                 });
                 container.appendChild(el);
@@ -144,23 +149,17 @@
             const universe = document.getElementById('viewport-universe');
             
             if (idx === 1) {
-                // 切换到旋转燃料：显示球体，隐藏所有弹窗
-                universe.classList.add('active');
+                universe.style.display = 'block';
+                setTimeout(() => universe.classList.add('active'), 10);
             } else {
-                // 切换到其他：隐藏球体，显示对应弹窗
                 universe.classList.remove('active');
+                universe.style.display = 'none';
                 const p = document.getElementById(`panel-${idx}`);
                 if (p) p.classList.add('active');
             }
         }
 
-        // 默认初始化
-        window.onload = () => { 
-            fetchCosmosData(); 
-            animate(); 
-            switchPanel(1); // 默认进入旋转燃料页面
-        };
-
+        window.onload = () => { fetchCosmosData(); animate(); switchPanel(1); };
         let sY = 0;
         window.addEventListener('touchstart', (e)=> sY = e.touches[0].pageY);
         window.addEventListener('touchend', (e)=>{
