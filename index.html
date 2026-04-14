@@ -3,27 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC小宇宙-V16.1验收版</title>
+    <title>KC小宇宙-V16.2全量版</title>
     <style>
         :root { --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
+        
+        /* 1. 之前确定的背景优化 */
         .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(30px) brightness(15%); }
-        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: linear-gradient(135deg, #000000 0%, #050a15 50%, #000000 100%); animation: bgPulse 15s infinite alternate ease-in-out; }
+        .space-bg { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; 
+            background: linear-gradient(135deg, #000000 0%, #050a15 50%, #000000 100%); 
+            animation: bgPulse 15s infinite alternate ease-in-out; 
+        }
         @keyframes bgPulse { 0% { filter: brightness(1); } 100% { filter: brightness(1.2) contrast(1.1); } }
+
         header { position: fixed; top: 0; left: 0; width: 100vw; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
         h1 { font-size: 1.4rem; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; margin-bottom: 8px; }
         .sync-info { font-size: 0.5rem; color: #666; letter-spacing: 2px; }
+        
         .container { display: flex; height: 100vh; width: 100vw; padding: 20px; gap: 10px; align-items: center; justify-content: center; transform: translateY(20px); }
         .side-nav { display: flex; flex-direction: column; width: 80px; gap: 12px; z-index: 10; }
         .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #444; width: 65px; height: 80px; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 18px; writing-mode: vertical-rl; letter-spacing: 4px; transition: 0.4s; }
         .tab-btn.active { color: #fff; border-color: var(--active-color); background: rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--active-color); }
+        
         .main-content { width: 300px; height: 480px; position: relative; perspective: 1000px; }
         .display-screen { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(20px); padding: 30px 20px; height: 100%; width: 100%; position: relative; clip-path: polygon(8% 0%, 100% 5%, 100% 95%, 92% 100%, 0% 95%, 0% 8%); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+        
         .content-panel { display: none; height: 100%; overflow-y: auto; scrollbar-width: none; line-height: 2.2; font-size: 0.9rem; color: #ccc; }
         .content-panel.active { display: block; }
+
         #fuel-nebula { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform-style: preserve-3d; }
         .star-item { position: absolute; cursor: pointer; font-weight: bold; white-space: nowrap; transition: color 0.4s, text-shadow 0.4s; will-change: transform, opacity; transform-origin: center; }
+        
         footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.4rem; opacity: 0.2; }
     </style>
 </head>
@@ -49,7 +61,7 @@
             </div>
         </main>
     </div>
-    <footer>CORE // K_STATION_V16.1</footer>
+    <footer>V16.2 FINAL_STABLE</footer>
 
     <script>
         const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now() + "_" + Math.random().toString(36).substr(2, 4);
@@ -75,14 +87,16 @@
                 if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
                 statusTag.innerText = "STATUS: SYNC_STABLE";
                 statusTag.style.color = "";
-            } catch (e) { statusTag.innerText = "STATUS: OFFLINE"; statusTag.style.color = "#ff5252"; }
+            } catch (e) { 
+                statusTag.innerText = "STATUS: OFFLINE"; 
+                statusTag.style.color = "#ff5252"; 
+            }
         }
 
         function initStars() {
             const container = document.getElementById('fuel-nebula');
             container.innerHTML = '';
             stars = [];
-            // 容量截断，防止数据爆炸
             const displayList = remoteBooks.slice(0, 150); 
             const count = displayList.length;
 
@@ -91,33 +105,26 @@
                 item.className = 'star-item';
                 item.innerText = book.title;
                 
-                // --- V16.1 极致验收：再次向上调整阶梯阈值 ---
-                const weight = Number(book.uniqueness) || 5; 
-                let color;
+                // --- 强校验逻辑：确保薛兆丰这种低权重的不会变白 ---
+                let rawWeight = String(book.uniqueness).trim();
+                const weight = parseFloat(rawWeight) || 5; 
                 
-                if (weight >= 20) { 
-                    color = "#ffffff"; // 仅限 20 分：核心纯白
-                } else if (weight >= 17) { 
-                    color = "#ffd54f"; // 17-19 分：极稀有琥珀黄（你的《阿西莫夫》16分此时为彩色 ✅）
-                } else if (weight >= 14) { 
-                    color = "#ff5252"; // 14-16 分：中高红（你的《基地》12分此时为彩色 ✅）
-                } else { 
-                    color = starColors[i % starColors.length]; // 其余彩色背景
-                }
+                let color;
+                if (weight >= 20) { color = "#ffffff"; }      // 核心白
+                else if (weight >= 17) { color = "#ffd54f"; } // 稀有黄
+                else if (weight >= 14) { color = "#ff5252"; } // 珊瑚红
+                else { color = starColors[i % starColors.length]; }
 
                 item.style.color = color;
-                // 修复发光导致的碰撞：根据数据量和权重，动态调小光晕
-                const shadowSize = Math.max(2, 6 - (count / 25) + (weight / 6));
+                // 优化光晕防止碰撞
+                const shadowSize = Math.max(2, 5 - (count / 30) + (weight / 8));
                 item.style.textShadow = `0 0 ${shadowSize}px ${color}`;
-                // 字号容错优化，防止长书名爆炸
+                // 调整基础字号
                 const baseSize = count > 80 ? 0.42 : 0.48;
                 item.style.fontSize = `${baseSize + weight/45}rem`;
 
-                // --- 物理算法优化：修复空间碰撞 ---
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                
-                // 动态拉大半径：根据数据量，强制书名散开
                 const radius = count > 80 ? 175 : 160; 
 
                 stars.push({
@@ -125,8 +132,7 @@
                     x: radius * Math.sin(phi) * Math.cos(theta),
                     y: radius * Math.sin(phi) * Math.sin(theta),
                     z: radius * Math.cos(phi),
-                    // 平方级速度差依然保留，动感更强
-                    speed: (0.005 + (weight * weight) / 35000) 
+                    speed: (0.005 + (weight * weight) / 38000) 
                 });
                 container.appendChild(item);
             });
@@ -155,15 +161,10 @@
             if(index === 1) setTimeout(initStars, 100);
         }
 
-        // --- 集成下拉刷新监听 ---
         let startY = 0;
-        const touchArea = document.getElementById('touch-area');
-        touchArea.addEventListener('touchstart', (e) => startY = e.touches[0].pageY);
-        touchArea.addEventListener('touchend', (e) => {
-            const endY = e.changedTouches[0].pageY;
-            if (endY - startY > 150) { 
-                fetchCosmosData(); // 触发无感同步
-            }
+        document.getElementById('touch-area').addEventListener('touchstart', (e) => startY = e.touches[0].pageY);
+        document.getElementById('touch-area').addEventListener('touchend', (e) => {
+            if (e.changedTouches[0].pageY - startY > 150) fetchCosmosData();
         });
 
         setInterval(() => { document.getElementById('sync-time').innerText = new Date().toTimeString().substring(0,5); }, 1000);
