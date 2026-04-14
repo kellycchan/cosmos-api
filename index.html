@@ -3,58 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC小宇宙-V16.8</title>
+    <title>KC宇宙-V16.9最终版</title>
     <style>
-        :root { --color-0: #5c9cd9; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-black); color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
+        body { background: #000; color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
         
-        /* 1. 确保背景深邃但不死黑 */
-        .space-bg { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
-            background: radial-gradient(circle at center, #0a1b3d 0%, #000000 100%);
-        }
+        /* 背景：确保中心微亮，防止死黑撞色 */
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at center, #0a1b3d 0%, #000000 100%); }
 
         header { position: fixed; top: 0; left: 0; width: 100vw; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
-        h1 { font-size: 1.4rem; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px #5c9cd9; text-transform: uppercase; }
+        h1 { font-size: 1.4rem; letter-spacing: 10px; text-shadow: 0 0 20px #5c9cd9; text-transform: uppercase; }
         .sync-info { font-size: 0.5rem; color: #444; margin-top: 8px; letter-spacing: 2px; }
         
         .container { display: flex; height: 100vh; width: 100vw; align-items: center; justify-content: center; transform: translateY(20px); }
         .side-nav { position: absolute; left: 15px; display: flex; flex-direction: column; gap: 12px; z-index: 10; }
-        .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #555; width: 60px; height: 80px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; border-radius: 20px; writing-mode: vertical-rl; }
-        .tab-btn.active { color: #fff; border-color: #5c9cd9; background: rgba(92, 156, 217, 0.2); }
+        .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #555; width: 60px; height: 85px; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; border-radius: 20px; writing-mode: vertical-rl; }
+        .tab-btn.active { color: #fff; border-color: #5c9cd9; background: rgba(92, 156, 217, 0.2); box-shadow: 0 0 15px #5c9cd9; }
         
         .main-content { width: 300px; height: 480px; position: relative; perspective: 1200px; }
         .display-screen { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); height: 100%; width: 100%; border-radius: 20px; overflow: hidden; position: relative; }
         
+        /* 核心修复：保持 3D 结构，半径调优 */
         #fuel-nebula { position: absolute; top: 50%; left: 50%; width: 1px; height: 1px; transform-style: preserve-3d; }
-        .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; transition: color 0.4s; }
+        .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; }
     </style>
 </head>
 <body>
     <div class="space-bg"></div>
     <header>
         <h1>KC小宇宙</h1>
-        <div class="sync-info">STATION_V16.8 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
+        <div class="sync-info">STATION_V16.9 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
     </header>
-    
     <div class="container" id="touch-area">
-        <nav class="side-nav">
-            <div class="tab-btn active">旋转燃料</div>
-        </nav>
-        <main class="main-content">
-            <div class="display-screen">
-                <div id="fuel-nebula"></div>
-            </div>
-        </main>
+        <nav class="side-nav"><div class="tab-btn active">旋转燃料</div></nav>
+        <main class="main-content"><div class="display-screen"><div id="fuel-nebula"></div></div></main>
     </div>
 
     <script>
-        const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now() + Math.random();
-        // 剔除所有暗色，确保 10 分以下也清晰
-        const brightColors = ['#a0e9ff', '#ffb7ff', '#98ff98', '#81d8d0', '#ffcc80', '#e0f7fa']; 
-        let remoteBooks = [];
-        let stars = [];
+        const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
+        // 10分以下彩色池：剔除所有暗色
+        const brightPool = ['#a0e9ff', '#ffb7ff', '#98ff98', '#ffcc80', '#e0f7fa', '#81d8d0'];
 
         async function fetchCosmosData() {
             const statusTag = document.getElementById('sync-status');
@@ -62,10 +50,7 @@
             try {
                 const res = await fetch(getUrl());
                 const data = await res.json();
-                if (data.readBooks) {
-                    remoteBooks = data.readBooks;
-                    initStars();
-                }
+                if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
                 statusTag.innerText = "SYNC_OK";
             } catch (e) { statusTag.innerText = "OFFLINE"; }
         }
@@ -81,34 +66,34 @@
                 el.className = 'star-item';
                 el.innerText = book.title;
 
-                // --- 严格阶梯阀值判定 ---
-                let val = String(book.uniqueness).replace(/[^0-9.]/g, ''); // 彻底清洗非数字字符
-                const w = parseFloat(val) || 5;
+                // --- 逻辑核武器：严格按照你的阀值判定 ---
+                let rawVal = String(book.uniqueness).replace(/[^0-9.]/g, ''); 
+                const w = parseFloat(rawVal) || 5;
                 
                 let col;
-                if (w >= 20) col = "#ffffff";           // 20: 纯白
-                else if (w >= 19) col = "#ffd54f";      // 19: 黄色
-                else if (w >= 18) col = "#ff5252";      // 18: 红色
-                else if (w >= 10) col = "#5c9cd9";      // 10-17: 蓝色
-                else col = brightColors[i % brightColors.length]; // 10以下: 其他明亮彩色
+                if (w >= 20) { col = "#ffffff"; }      // 20: 纯白
+                else if (w >= 19) { col = "#ffd54f"; } // 19: 黄色
+                else if (w >= 18) { col = "#ff5252"; } // 18: 红色
+                else if (w >= 10) { col = "#5c9cd9"; } // 10-17: 蓝色
+                else { col = brightPool[i % brightPool.length]; } // 10以下: 彩色
 
                 el.style.color = col;
-                el.style.textShadow = `0 0 ${4 + w/4}px ${col}`;
+                el.style.textShadow = `0 0 ${3 + w/5}px ${col}`;
                 
-                // 解决重叠：书名长则缩放，并防止字号过大遮挡
-                const lenRatio = book.title.length > 8 ? 0.82 : 1;
+                // 防止书名太长重叠：长标题缩放
+                const lenRatio = book.title.length > 8 ? 0.8 : 1;
                 el.style.fontSize = `${(0.45 + w/55) * lenRatio}rem`;
 
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                const r = 160; // 稳定球体半径，不挤线
+                const r = 160; // 核心半径，恢复球体感
 
                 stars.push({
                     el: el,
                     x: r * Math.sin(phi) * Math.cos(theta),
                     y: r * Math.sin(phi) * Math.sin(theta),
                     z: r * Math.cos(phi),
-                    speed: (0.005 + (w * w) / 45000)
+                    v: (0.005 + (w * w) / 45000)
                 });
                 container.appendChild(el);
             });
@@ -116,15 +101,13 @@
 
         function animate() {
             stars.forEach(s => {
-                const cos = Math.cos(s.speed);
-                const sin = Math.sin(s.speed);
+                const cos = Math.cos(s.v);
+                const sin = Math.sin(s.v);
                 const x1 = s.x * cos - s.z * sin;
                 const z1 = s.z * cos + s.x * sin;
                 s.x = x1; s.z = z1;
-
                 const scale = (s.z + 160) / 320 * 0.5 + 0.5;
                 const opacity = (s.z + 160) / 320 * 0.7 + 0.3;
-                
                 s.el.style.transform = `translate3d(${s.x}px, ${s.y}px, ${s.z}px) scale(${scale})`;
                 s.el.style.opacity = opacity;
                 s.el.style.zIndex = Math.floor(s.z + 160);
