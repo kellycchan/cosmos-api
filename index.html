@@ -3,80 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC小宇宙</title>
+    <title>KC小宇宙-词云版</title>
     <style>
         :root { --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; min-height: 100vh; width: 100vw; }
-        
+        body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
         .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(25px) brightness(20%); }
-        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 70% 70%, rgba(20, 30, 50, 0.4) 0%, rgba(0, 0, 0, 1) 100%); }
+        .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 0.3) 0%, rgba(0, 0, 0, 1) 100%); }
+        header { position: fixed; top: 0; left: 0; width: 100vw; height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
+        h1 { font-size: 1.4rem; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; margin-bottom: 10px; }
+        .sync-info { font-size: 0.5rem; color: #444; letter-spacing: 2px; }
+        .container { display: flex; height: 100vh; width: 100vw; padding: 20px; gap: 15px; align-items: center; justify-content: center; transform: translateY(30px); }
+        .side-nav { display: flex; flex-direction: column; width: 75px; gap: 12px; z-index: 10; }
+        .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #444; width: 65px; height: 65px; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 18px; writing-mode: vertical-rl; letter-spacing: 3px; transition: 0.4s; }
+        .tab-btn.active { color: #fff; border-color: var(--active-color); background: rgba(255,255,255,0.1); }
+        .main-content { width: 300px; height: 450px; position: relative; perspective: 1000px; }
+        .display-screen { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(25px); padding: 35px 25px; height: 100%; width: 100%; position: relative; clip-path: polygon(8% 0%, 100% 5%, 100% 95%, 92% 100%, 0% 95%, 0% 8%); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+        .content-panel { display: none; height: 100%; }
+        .content-panel.active { display: block; }
         
-        header { position: fixed; top: 0; left: 0; width: 100vw; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 20; background: linear-gradient(to bottom, black, transparent); }
-        h1 { font-size: 1.4rem; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; }
-        .sync-info { font-size: 0.5rem; color: #444; letter-spacing: 2px; display: flex; gap: 15px; margin-top: 10px; }
-        .divider-active { width: 180px; height: 1px; background: linear-gradient(90deg, transparent, var(--active-color), transparent); margin-top: 8px; }
-
-        .container { display: flex; padding-top: 120px; padding-bottom: 50px; width: 100vw; min-height: 100vh; gap: 15px; justify-content: center; }
-        .side-nav { position: sticky; top: 130px; display: flex; flex-direction: column; width: 70px; gap: 12px; height: fit-content; z-index: 10; }
-        .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #444; width: 65px; height: 65px; font-size: 0.7rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 15px; writing-mode: vertical-rl; letter-spacing: 2px; transition: all 0.4s; }
-        .tab-btn.active { color: #fff; border-color: var(--active-color); background: rgba(255,255,255,0.08); box-shadow: 0 0 15px var(--active-color); }
-
-        .main-content { width: 280px; min-height: 500px; position: relative; perspective: 1000px; }
-        .display-screen { 
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px); 
-            padding: 30px 20px; width: 100%; min-height: 500px; position: relative; 
-            clip-path: polygon(5% 0%, 100% 2%, 100% 98%, 0% 100%, 0% 5%);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .content-panel { display: none; line-height: 2.2; font-size: 0.9rem; color: #bbb; }
-        .content-panel.active { display: block; animation: panelFade 0.5s ease forwards; }
-
-        /* 星云：原点微调，扩大范围 */
+        /* 词云旋转核心 */
         #fuel-nebula { 
-            position: absolute; top: 40%; left: 45%; 
+            position: absolute; top: 50%; left: 50%; 
             width: 100%; height: 100%; 
             transform-style: preserve-3d;
+            animation: nebulaRotate 20s infinite linear; /* 关键：自动旋转 */
         }
         .star-item { 
-            position: absolute; cursor: pointer; color: #7dbdbd; font-family: monospace; 
-            font-weight: bold; text-shadow: 0 0 8px #7dbdbd; white-space: nowrap; 
-            transform: translate(-50%, -50%); transition: all 0.5s ease;
+            position: absolute; color: #7dbdbd; font-weight: bold; 
+            text-shadow: 0 0 8px #7dbdbd; white-space: nowrap; 
+            transform-origin: center center; transition: all 0.5s;
         }
-
-        @keyframes panelFade { from { opacity: 0; transform: translateZ(-50px); } to { opacity: 1; transform: translateZ(0); } }
-        footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.5rem; opacity: 0.2; pointer-events: none; }
+        @keyframes nebulaRotate { 
+            from { transform: translate(-50%, -50%) rotateY(0deg) rotateX(0deg); }
+            to { transform: translate(-50%, -50%) rotateY(360deg) rotateX(360deg); }
+        }
+        @keyframes panelFade { from { opacity: 0; } to { opacity: 1; } }
+        footer { position: fixed; bottom: 15px; width: 100%; text-align: center; font-size: 0.4rem; opacity: 0.2; }
     </style>
 </head>
 <body>
-    <div class="bg-overlay"></div>
-    <div class="space-bg"></div>
+    <div class="bg-overlay"></div><div class="space-bg"></div>
     <header>
         <h1 id="title">KC小宇宙</h1>
-        <div class="sync-info"><span>DIM: 11D</span><span id="sync-status">STATUS: SYNC_STABLE</span><span>VECTOR: <span id="sync-time">--:--</span></span></div>
-        <div id="divider" class="divider-active"></div>
+        <div class="sync-info"><span>DIM: 11D</span> | <span id="sync-status">STATUS: INIT</span> | <span id="sync-time">00:00</span></div>
     </header>
     <div class="container">
         <nav class="side-nav">
-            <div class="tab-btn active" onclick="switchPanel(0)">诞生日</div>
-            <div class="tab-btn" onclick="switchPanel(1)">旋转燃料</div>
-            <div class="tab-btn" onclick="switchPanel(2)">照亮空间</div>
-            <div class="tab-btn" onclick="switchPanel(3)">终极进化</div>
+            <div class="tab-btn active" onclick="switchPanel(0)">诞生</div>
+            <div class="tab-btn" onclick="switchPanel(1)">燃料</div>
+            <div class="tab-btn" onclick="switchPanel(2)">空间</div>
+            <div class="tab-btn" onclick="switchPanel(3)">进化</div>
         </nav>
         <main class="main-content">
             <div class="display-screen">
                 <div class="content-panel active" id="panel-0"></div>
-                <div class="content-panel" id="panel-1" style="overflow:visible;"><div id="fuel-nebula"></div></div>
+                <div class="content-panel" id="panel-1"><div id="fuel-nebula"></div></div>
                 <div class="content-panel" id="panel-2"></div>
                 <div class="content-panel" id="panel-3"></div>
             </div>
         </main>
     </div>
-    <footer>CORE // K_STATION_V12.0</footer>
+    <footer>V13.0 WORD_CLOUD_MODE</footer>
 
     <script>
-        const DATA_URL = "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?update=" + new Date().getTime();
+        const DATA_URL = "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Math.random();
         const colors = ['#5c9cd9', '#7dbdbd', '#9b84b3', '#d1d1d1'];
         let remoteBooks = [];
 
@@ -90,9 +81,12 @@
                         if (p && index !== 1) p.innerHTML = item.content;
                     });
                 }
-                if (data.readBooks) remoteBooks = data.readBooks;
-                switchPanel(0);
-            } catch (e) { console.error(e); }
+                if (data.readBooks) {
+                    remoteBooks = data.readBooks;
+                    renderFuelNebula();
+                }
+                document.getElementById('sync-status').innerText = "STATUS: SYNC_STABLE";
+            } catch (e) { document.getElementById('sync-status').innerText = "STATUS: OFFLINE"; }
         }
 
         function renderFuelNebula() {
@@ -100,27 +94,30 @@
             if(!container || remoteBooks.length === 0) return;
             container.innerHTML = '';
             
+            const count = remoteBooks.length;
             remoteBooks.forEach((book, i) => {
                 const item = document.createElement('div');
                 item.className = 'star-item';
                 item.innerText = book.title;
                 
-                // 【全空间散布算法】
-                // 通过 i 的余数强制分布到不同方向
-                const angle = (i / remoteBooks.length) * Math.PI * 2 + Math.random();
-                const distMultiplier = i % 2 === 0 ? 1.5 : 0.8; // 交替远近
-                const x = Math.cos(angle) * (120 * distMultiplier);
-                const y = Math.sin(angle) * (180 * distMultiplier) + (i * 10); // 纵向拉伸，填补右下
-                const z = Math.sin(i) * 300; 
+                // 【词云球体算法】
+                const phi = Math.acos(-1 + (2 * i) / count);
+                const theta = Math.sqrt(count * Math.PI) * phi;
+                const radius = 130; // 球体半径
 
-                item.style.transform = `translate3d(${x}px, ${y}px, ${z}px) scale(${(z+400)/500})`;
-                item.style.opacity = (z + 400) / 700;
-                
+                const x = radius * Math.sin(phi) * Math.cos(theta);
+                const y = radius * Math.sin(phi) * Math.sin(theta);
+                const z = radius * Math.cos(phi);
+
+                // 让文字始终正对着用户（虽然容器在转）
+                item.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+                item.style.fontSize = `${0.7 + book.uniqueness/15}rem`;
+                item.style.opacity = (z + radius) / (2 * radius) + 0.3;
+
                 item.onclick = (e) => {
                     e.stopPropagation();
                     item.style.color = "#fff";
-                    item.style.textShadow = "0 0 30px #fff";
-                    item.style.fontSize = "1.2rem";
+                    item.style.textShadow = "0 0 20px #fff";
                 };
                 container.appendChild(item);
             });
@@ -130,7 +127,7 @@
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === index));
             document.querySelectorAll('.content-panel').forEach((p, i) => p.classList.toggle('active', i === index));
             document.documentElement.style.setProperty('--active-color', colors[index]);
-            if(index === 1) setTimeout(renderFuelNebula, 50);
+            if(index === 1) renderFuelNebula();
         }
 
         setInterval(() => { document.getElementById('sync-time').innerText = new Date().toTimeString().substring(0,5); }, 1000);
