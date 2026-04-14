@@ -69,8 +69,7 @@
         <div class="content-panel" id="panel-0"></div>
         <div class="content-panel" id="panel-2">
             <div id="map-box">
-                <svg id="china-svg" viewBox="0 0 1000 800">
-                    <path class="map-outline" d="M856,128 C878,114 911,146 908,187 C906,211 936,222 915,251 C895,278 920,314 883,342 C857,362 884,402 858,429 C833,455 863,495 843,534 C827,566 852,607 828,639 C812,660 812,711 777,725 C740,740 690,724 651,732 C597,743 540,718 485,712 C422,705 358,683 296,674 C225,664 153,656 86,626 C57,613 36,580 47,549 C59,516 100,503 94,468 C87,427 48,405 53,364 C57,328 102,305 137,288 C179,268 226,260 272,251 C322,241 371,223 421,215 C478,206 536,208 593,195 C646,183 699,174 751,159 C784,149 819,142 856,128 Z" />
+                <svg id="china-svg" viewBox="0 0 1000 800">            
                 </svg>
             </div>
             <div id="map-note">点击星点，照亮每一处足迹。</div>
@@ -107,26 +106,21 @@
 
         function drawMap(points) {
             const svg = document.getElementById('china-svg');
-            const outline = svg.querySelector('.map-outline').getAttribute('d');
-            let content = `<path class="map-outline" d="${outline}" />`;
+    // 去掉了获取 outline 的那两行
+            let content = '';  
             points.forEach((pt) => {
-                // 视觉点：比之前大，且带呼吸动画
-                content += `<circle class="map-dot" cx="${pt.x}" cy="${pt.y}" r="10" pointer-events="none">
-                    <animate attributeName="r" values="9;13;9" dur="2.5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite" />
-                </circle>`;
-                // 强力点击域：30像素半径的隐形圆，极大地提升手感
-                content += `<circle cx="${pt.x}" cy="${pt.y}" r="30" fill="transparent" style="cursor:pointer" onclick="showNote('${pt.note}', this.previousSibling)"></circle>`;
-            });
-            svg.innerHTML = content;
-        }
-
-        window.showNote = (note, el) => {
-            if (navigator.vibrate) navigator.vibrate(15); 
-            document.querySelectorAll('.map-dot').forEach(d => d.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('map-note').innerHTML = `<span class="highlight">LOCATE</span> <br> ${note}`;
-        };
+        // 视觉圆点
+            content += `<circle class="map-dot" cx="${pt.x}" cy="${pt.y}" r="10" pointer-events="none">
+                <animate attributeName="r" values="9;13;9" dur="2.5s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite" />
+            </circle>`;
+        // 强力点击域
+            content += `<circle cx="${pt.x}" cy="${pt.y}" r="30" fill="transparent" style="cursor:pointer" 
+                onclick="showNote('${pt.note}', this.previousSibling)">
+            </circle>`;
+        });
+        svg.innerHTML = content;
+},
 
         function initStars() {
             const container = document.getElementById('fuel-nebula');
