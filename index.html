@@ -111,7 +111,7 @@
                 const z = radius * Math.cos(phi);
 
                 item.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
-                item.style.fontSize = `${0.75 + book.uniqueness/15}rem`;
+                item.style.fontSize = `${0.5 + book.uniqueness/15}rem`;
                 item.style.opacity = (z + radius) / (2 * radius) + 0.3;
 
                 item.onclick = (e) => {
