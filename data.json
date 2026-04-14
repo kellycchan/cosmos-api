@@ -19,12 +19,12 @@
   ],
   "readBooks": [
     { "title": "三体全集", "uniqueness": 10 },
-    { "title": "失控", "uniqueness": 9 },
-    { "title": "平凡的世界", "uniqueness": 8 },
-    { "title": "人类简史", "uniqueness": 7 },
-    { "title": "瓦尔登湖", "uniqueness": 9 },
+    { "title": "自控力", "uniqueness": 9 },
+    { "title": "1984", "uniqueness": 8 },
+    { "title": "质数的孤独", "uniqueness": 7 },
+    { "title": "基地", "uniqueness": 9 },
     { "title": "沉默的大多数", "uniqueness": 9 },
-    { "title": "自私的基因", "uniqueness": 7 },
-    { "title": "认知觉醒", "uniqueness": 8 }
+    { "title": "绚烂千阳", "uniqueness": 7 },
+    { "title": "湮灭", "uniqueness": 8 }
   ]
 }
