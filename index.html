@@ -104,8 +104,8 @@
             const path = svg.querySelector('path').outerHTML;
             let dots = path;
             points.forEach((pt, i) => {
-                dots += `<circle class="map-dot" cx="${pt.x}" cy="${pt.y}" r="5" onclick="showNote('${pt.note}', this)">
-                    <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite" />
+                dots += `<circle class="map-dot" cx="${pt.x}" cy="${pt.y}" r="10" onclick="showNote('${pt.note}', this)">
+                    <animate attributeName="r" values="8;12;8" dur="2s" repeatCount="indefinite" />
                 </circle>`;
             });
             svg.innerHTML = dots;
