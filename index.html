@@ -3,60 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC小宇宙-V13.5</title>
+    <title>KC小宇宙-能量加强版</title>
     <style>
         :root { --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-black); color: #fff; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
-        
         .bg-overlay { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; z-index: -3; background-image: url('background.jpg'); background-size: cover; background-position: center; filter: blur(25px) brightness(20%); }
         .space-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 0.3) 0%, rgba(0, 0, 0, 1) 100%); }
-        
         header { position: fixed; top: 0; left: 0; width: 100vw; height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; }
         h1 { font-size: 1.4rem; letter-spacing: 10px; color: #fff; text-shadow: 0 0 20px var(--active-color, var(--color-0)); text-transform: uppercase; margin-bottom: 10px; }
         .sync-info { font-size: 0.5rem; color: #444; letter-spacing: 2px; }
-        
         .container { display: flex; height: 100vh; width: 100vw; padding: 20px; gap: 15px; align-items: center; justify-content: center; transform: translateY(30px); }
         .side-nav { display: flex; flex-direction: column; width: 85px; gap: 12px; z-index: 10; }
         .tab-btn { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); color: #444; width: 75px; height: 85px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 20px; writing-mode: vertical-rl; letter-spacing: 4px; transition: 0.4s; }
         .tab-btn.active { color: #fff; border-color: var(--active-color); background: rgba(255,255,255,0.1); box-shadow: 0 0 15px var(--active-color); }
-        
         .main-content { width: 300px; height: 450px; position: relative; perspective: 1000px; }
         .display-screen { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(25px); padding: 35px 25px; height: 100%; width: 100%; position: relative; clip-path: polygon(8% 0%, 100% 5%, 100% 95%, 92% 100%, 0% 95%, 0% 8%); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
-        
         .content-panel { display: none; height: 100%; overflow-y: auto; scrollbar-width: none; line-height: 2.2; font-size: 0.95rem; color: #ccc; }
-        .content-panel::-webkit-scrollbar { display: none; }
         .content-panel.active { display: block; }
-        
-        /* 3D 球体旋转容器 */
+
+        /* 旋转容器 */
         #fuel-nebula { 
             position: absolute; top: 50%; left: 50%; 
             width: 10px; height: 10px; 
             transform-style: preserve-3d;
-            animation: nebulaRotate 30s infinite linear; 
+            animation: globalRotate 40s infinite linear; 
         }
         .star-item { 
             position: absolute; cursor: pointer; font-weight: bold; 
-            white-space: nowrap; transform: translate(-50%, -50%); 
-            transition: all 0.5s ease;
+            white-space: nowrap; transform-origin: center;
+            transition: color 0.5s, text-shadow 0.5s;
         }
-        
-        @keyframes nebulaRotate { 
-            from { transform: translate(-50%, -50%) rotateY(0deg) rotateX(0deg); }
-            to { transform: translate(-50%, -50%) rotateY(360deg) rotateX(360deg); }
+
+        /* 基础全局旋转 */
+        @keyframes globalRotate { 
+            from { transform: translate(-50%, -50%) rotateY(0deg); }
+            to { transform: translate(-50%, -50%) rotateY(360deg); }
         }
-        
+
+        /* 个体加速动画：根据权重会动态修改速度 */
+        @keyframes fastRotate {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
         footer { position: fixed; bottom: 15px; width: 100%; text-align: center; font-size: 0.4rem; opacity: 0.2; }
-        .highlight { color: var(--active-color); text-shadow: 0 0 10px var(--active-color); }
     </style>
 </head>
 <body>
     <div class="bg-overlay"></div><div class="space-bg"></div>
     <header>
         <h1 id="title">KC小宇宙</h1>
-        <div class="sync-info"><span>DIM: 11D</span> | <span id="sync-status">STATUS: INIT</span> | <span id="sync-time">00:00</span></div>
+        <div class="sync-info"><span>DIM: 11D</span> | <span id="sync-status">STATUS: SYNC_STABLE</span> | <span id="sync-time">00:00</span></div>
     </header>
-    
     <div class="container">
         <nav class="side-nav">
             <div class="tab-btn active" onclick="switchPanel(0)">诞生日</div>
@@ -64,7 +63,6 @@
             <div class="tab-btn" onclick="switchPanel(2)">照亮空间</div>
             <div class="tab-btn" onclick="switchPanel(3)">终极进化</div>
         </nav>
-        
         <main class="main-content">
             <div class="display-screen">
                 <div class="content-panel active" id="panel-0"></div>
@@ -74,8 +72,7 @@
             </div>
         </main>
     </div>
-    
-    <footer>CORE // K_STATION_V13.5</footer>
+    <footer>CORE // K_STATION_V14.0</footer>
 
     <script>
         const DATA_URL = "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Math.random();
@@ -93,61 +90,47 @@
                         if (p && index !== 1) p.innerHTML = item.content;
                     });
                 }
-                if (data.readBooks) {
-                    remoteBooks = data.readBooks;
-                    renderFuelNebula();
-                }
-                document.getElementById('sync-status').innerText = "STATUS: SYNC_STABLE";
-            } catch (e) { 
-                document.getElementById('sync-status').innerText = "STATUS: OFFLINE";
-            }
+                if (data.readBooks) { remoteBooks = data.readBooks; renderFuelNebula(); }
+            } catch (e) { document.getElementById('sync-status').innerText = "STATUS: OFFLINE"; }
         }
+
         function renderFuelNebula() {
             const container = document.getElementById('fuel-nebula');
             if(!container || remoteBooks.length === 0) return;
             container.innerHTML = '';
             
             const count = remoteBooks.length;
-            const starColors = ['#7dbdbd', '#9b84b3', '#d1d1d1', '#5c9cd9', '#e0e0e0'];
-
             remoteBooks.forEach((book, i) => {
                 const item = document.createElement('div');
                 item.className = 'star-item';
                 item.innerText = book.title;
                 
-                // --- 核心修改：根据权重(uniqueness)决定颜色与层次 ---
-                let color;
-                let shadowColor;
                 const weight = book.uniqueness || 5;
                 
-                if (weight >= 15) {
-                    color = "#ffffff"; // 高权重纯白
-                    shadowColor = "rgba(255, 255, 255, 0.9)";
-                    item.style.zIndex = "100";
-                } else if (weight >= 10) {
-                    color = "#e0f7fa"; // 中权重亮青
-                    shadowColor = "#7dbdbd";
-                    item.style.zIndex = "50";
-                } else {
-                    color = starColors[i % starColors.length]; // 普通权重循环色
-                    shadowColor = color;
-                    item.style.zIndex = "1";
-                }
-
+                // 1. 颜色逻辑
+                let color;
+                if (weight >= 15) { color = "#ffffff"; item.style.zIndex = "100"; }
+                else if (weight >= 10) { color = "#e0f7fa"; item.style.zIndex = "50"; }
+                else { color = starColors[i % starColors.length]; item.style.zIndex = "1"; }
                 item.style.color = color;
-                item.style.textShadow = `0 0 10px ${shadowColor}`;
+                item.style.textShadow = `0 0 10px ${color}`;
                 
-                // 字体缩放逻辑保持一致
-                item.style.fontSize = `${0.5 + weight/30}rem`;
+                // 2. 字体逻辑
+                item.style.fontSize = `${0.45 + weight/35}rem`;
 
-                // 3D 黄金分割球体坐标算法
+                // 3. 3D 坐标
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
                 const radius = 135; 
-
                 const x = radius * Math.sin(phi) * Math.cos(theta);
                 const y = radius * Math.sin(phi) * Math.sin(theta);
                 const z = radius * Math.cos(phi);
+
+                // 4. 【核心：能量关联转速】
+                // 权重越高，动画时长(duration)越短，转得越快
+                // 默认 30s，权重 20 时变为 10s
+                const duration = 40 - (weight * 1.5); 
+                item.style.animation = `fastRotate ${duration}s infinite linear`;
 
                 item.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
                 item.style.opacity = (z + radius) / (2 * radius) + 0.3;
@@ -155,8 +138,8 @@
                 item.onclick = (e) => {
                     e.stopPropagation();
                     item.style.color = "#ffffff";
-                    item.style.textShadow = "0 0 20px #ffffff, 0 0 40px #ffffff";
-                    item.style.transform += " scale(1.4)";
+                    item.style.textShadow = "0 0 30px #ffffff";
+                    item.style.transform += " scale(1.5)";
                 };
                 container.appendChild(item);
             });
@@ -169,10 +152,7 @@
             if(index === 1) setTimeout(renderFuelNebula, 100);
         }
 
-        setInterval(() => { 
-            document.getElementById('sync-time').innerText = new Date().toTimeString().substring(0,5); 
-        }, 1000);
-        
+        setInterval(() => { document.getElementById('sync-time').innerText = new Date().toTimeString().substring(0,5); }, 1000);
         window.onload = fetchCosmosData;
     </script>
 </body>
