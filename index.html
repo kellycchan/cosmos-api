@@ -3,30 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC宇宙-V19.0-TopNav</title>
+    <title>KC宇宙-V20.0-MapReady</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: radial-gradient(circle at center, #050c1a 0%, #000000 100%); color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
-        
-        /* 顶部区域重构 */
         header { position: fixed; top: 0; left: 0; width: 100vw; padding-top: 15px; display: flex; flex-direction: column; align-items: center; z-index: 200; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none; }
         h1 { font-size: 1.2rem; letter-spacing: 8px; text-shadow: 0 0 20px rgba(92, 156, 217, 0.4); text-transform: uppercase; opacity: 0.9; }
         .sync-info { font-size: 0.5rem; color: rgba(255, 255, 255, 0.3); margin-top: 5px; letter-spacing: 1px; }
 
-        /* 顶部横向导航栏 */
         .top-nav { position: fixed; top: 75px; left: 0; width: 100vw; display: flex; justify-content: center; gap: 8px; padding: 0 10px; z-index: 210; pointer-events: auto; }
         .tab-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #666; flex: 1; max-width: 85px; height: 35px; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: 0.3s; backdrop-filter: blur(10px); }
         .tab-btn.active { color: #fff; border-color: rgba(92, 156, 217, 0.6); background: rgba(92, 156, 217, 0.2); box-shadow: 0 0 15px rgba(92, 156, 217, 0.2); }
 
-        /* 内容区域 */
         .viewport { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; perspective: 1200px; z-index: 10; display: none; }
         .viewport.active { display: block; }
         #fuel-intro { position: absolute; top: 140px; left: 50%; transform: translateX(-50%); width: 85%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.75rem; line-height: 1.5; z-index: 5; pointer-events: none; }
         #fuel-nebula { position: absolute; top: 55%; left: 50%; transform-style: preserve-3d; }
         
-        .content-panel { position: fixed; top: 58%; left: 50%; transform: translate(-50%, -50%); width: 88vw; max-height: 65vh; background: transparent; padding: 20px; overflow-y: auto; display: none; z-index: 150; color: #aaa; line-height: 1.8; font-size: 0.95rem; }
+        .content-panel { position: fixed; top: 58%; left: 50%; transform: translate(-50%, -50%); width: 88vw; max-height: 65vh; background: transparent; padding: 10px; overflow-y: auto; display: none; z-index: 150; color: #aaa; line-height: 1.8; font-size: 0.95rem; }
         .content-panel.active { display: block; }
         
+        /* 地图专用样式 */
+        #map-box { position: relative; width: 100%; height: 280px; margin-top: 10px; }
+        #china-svg { width: 100%; height: 100%; opacity: 0.5; stroke: rgba(255,255,255,0.3); stroke-width: 0.8; fill: none; }
+        .map-dot { fill: hsl(50, 85%, 70%); cursor: pointer; transition: 0.3s; }
+        .map-dot.active { fill: #fff; r: 7; filter: drop-shadow(0 0 8px #fff); }
+        #map-note { margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 0.8rem; border: 1px dashed rgba(255,255,255,0.1); min-height: 50px; }
+
         .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; }
         footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.4rem; color: rgba(255, 255, 255, 0.15); letter-spacing: 1px; pointer-events: none; }
         .highlight { color: #5c9cd9; }
@@ -35,7 +38,7 @@
 <body>
     <header>
         <h1>KC小宇宙</h1>
-        <div class="sync-info">STATION_V19.0 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
+        <div class="sync-info">STATION_V20.0 | <span id="sync-status">READY</span> | <span id="sync-time">00:00</span></div>
     </header>
 
     <nav class="top-nav">
@@ -52,11 +55,18 @@
 
     <div id="panels-container">
         <div class="content-panel" id="panel-0"></div>
-        <div class="content-panel" id="panel-2"></div>
+        <div class="content-panel" id="panel-2">
+            <div id="map-box">
+                <svg id="china-svg" viewBox="0 0 1000 800">
+                    <path d="M785,130 L800,150 L820,160 L850,250 L880,300 L860,400 L870,550 L850,650 L800,720 L750,700 L650,710 L550,750 L400,720 L300,650 L150,550 L100,450 L120,350 L150,250 L250,150 L400,120 L550,130 L700,100 Z" />
+                </svg>
+            </div>
+            <div id="map-note">点击地图上的星点，照亮去过的远方。</div>
+        </div>
         <div class="content-panel" id="panel-3"></div>
     </div>
 
-    <footer>KC_COSMOS_V19.0_TOP_LAYOUT</footer>
+    <footer>KC_COSMOS_V20.0_MAP_INTEGRATED</footer>
 
     <script>
         const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
@@ -72,14 +82,40 @@
                 if (data.panels) {
                     data.panels.forEach((item, idx) => {
                         const p = document.getElementById(`panel-${idx}`);
-                        if (p) p.innerHTML = item.content;
+                        if (!p) return;
+                        // 旋转燃料简介
                         if (idx === 1) document.getElementById('fuel-intro').innerHTML = item.content;
+                        // 照亮空间逻辑
+                        else if (idx === 2) {
+                            if (item.footprints) drawMap(item.footprints);
+                        } 
+                        else p.innerHTML = item.content;
                     });
                 }
                 if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
                 statusTag.innerText = "OK";
             } catch (e) { statusTag.innerText = "OFFLINE"; }
         }
+
+        function drawMap(points) {
+            const svg = document.getElementById('china-svg');
+            const noteBox = document.getElementById('map-note');
+            // 保留轮廓，清除旧点
+            const path = svg.querySelector('path').outerHTML;
+            let dots = path;
+            points.forEach((pt, i) => {
+                dots += `<circle class="map-dot" cx="${pt.x}" cy="${pt.y}" r="5" onclick="showNote('${pt.note}', this)">
+                    <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite" />
+                </circle>`;
+            });
+            svg.innerHTML = dots;
+        }
+
+        window.showNote = (note, el) => {
+            document.querySelectorAll('.map-dot').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('map-note').innerHTML = `<span class="highlight">></span> ${note}`;
+        };
 
         function initStars() {
             const container = document.getElementById('fuel-nebula');
@@ -94,20 +130,16 @@
                 el.className = 'star-item'; el.innerText = book.title;
                 let val = String(book.uniqueness).replace(/[^0-9.]/g, '');
                 const w = parseFloat(val) || 5;
-                
                 let col;
                 if (w >= 20) col = "hsl(0, 0%, 95%)";
                 else if (w >= 18) col = "hsl(0, 50%, 75%)";
                 else if (w >= 10) col = "hsl(210, 30%, 65%)";
                 else col = morandiPool[i % morandiPool.length];
-
                 el.style.color = col;
                 const lenRatio = book.title.length > 8 ? 0.7 : 1; 
                 el.style.fontSize = `${(0.38 + w/35) * lenRatio}rem`;
-                
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                
                 stars.push({
                     el: el, x: r * Math.sin(phi) * Math.cos(theta), y: r * Math.sin(phi) * Math.sin(theta), z: r * Math.cos(phi),
                     v: (0.022 + (w * w) / 8000) * speedBoost 
