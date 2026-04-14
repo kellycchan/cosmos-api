@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC宇宙-V20.3-LayoutTuned</title>
+    <title>KC宇宙-V20.3-PureStar</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: radial-gradient(circle at center, #050c1a 0%, #000000 100%); color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; width: 100vw; touch-action: none; }
@@ -20,26 +20,13 @@
         #fuel-intro { position: absolute; top: 140px; left: 50%; transform: translateX(-50%); width: 85%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.75rem; line-height: 1.5; z-index: 5; pointer-events: none; }
         #fuel-nebula { position: absolute; top: 55%; left: 50%; transform-style: preserve-3d; }
         
-        /* 调优内容面板：去掉顶部 padding 让地图上移 */
         .content-panel { position: fixed; top: 58%; left: 50%; transform: translate(-50%, -50%); width: 88vw; max-height: 65vh; background: transparent; padding: 0 10px 10px 10px; overflow-y: auto; display: none; z-index: 150; color: #aaa; line-height: 1.8; font-size: 0.95rem; }
         .content-panel.active { display: block; }
         
-        /* 调优地图盒子：扩大高度，负 margin 上提 */
-        #map-box { position: relative; width: 110%; left: -5%; height: 400px; margin-top: -25px; display: flex; justify-content: center; align-items: center; }
-        #china-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 8px rgba(92, 156, 217, 0.3)); }
-        .map-outline { 
-            stroke: rgba(92, 156, 217, 0.8); /* 稍微加深颜色，显得更专业 */
-            stroke-width: 2; 
-            fill: rgba(92, 156, 217, 0.1); 
-            stroke-linejoin: round;
-            filter: drop-shadow(0 0 5px rgba(92, 156, 217, 0.4)); 
-    }
-
-    /*.map-outline { stroke: rgba(255,255,255,0.25); stroke-width: 1.5; fill: rgba(92, 156, 217, 0.05); }*/
-        .map-dot { fill: hsl(50, 95%, 75%); cursor: pointer; stroke: rgba(255, 255, 255, 0.15); stroke-width: 5px; }
+        #map-box { position: relative; width: 100%; height: 400px; margin-top: -20px; display: flex; justify-content: center; align-items: center; }
+        #china-svg { width: 100%; height: 100%; }
+        .map-dot { fill: hsl(50, 95%, 75%); stroke: rgba(255, 255, 255, 0.2); stroke-width: 5px; cursor: pointer; }
         .map-dot.active { fill: #fff; r: 12; filter: drop-shadow(0 0 15px #fff); }
-        
-        /* 紧凑化笔记面板 */
         #map-note { margin-top: 5px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 0.85rem; border: 1px dashed rgba(255,255,255,0.1); min-height: 60px; color: #ddd; }
 
         .star-item { position: absolute; white-space: nowrap; font-weight: bold; transform-origin: center; pointer-events: none; }
@@ -69,15 +56,14 @@
         <div class="content-panel" id="panel-0"></div>
         <div class="content-panel" id="panel-2">
             <div id="map-box">
-                <svg id="china-svg" viewBox="0 0 1000 800">            
-                </svg>
+                <svg id="china-svg" viewBox="0 0 1000 800"></svg>
             </div>
-            <div id="map-note">点击星点，照亮每一处足迹。</div>
+            <div id="map-note">点击星群，回顾每一处足迹。</div>
         </div>
         <div class="content-panel" id="panel-3"></div>
     </div>
 
-    <footer>KC_COSMOS_V20.3_FINAL_LAYOUT</footer>
+    <footer>KC_COSMOS_V20.3_PURE_STAR_FIX</footer>
 
     <script>
         const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
@@ -100,27 +86,32 @@
                     });
                 }
                 if (data.readBooks) { remoteBooks = data.readBooks; initStars(); }
-                statusTag.innerText = "OK";
-            } catch (e) { statusTag.innerText = "OFFLINE"; }
+                statusTag.innerText = "READY";
+            } catch (e) { statusTag.innerText = "OFFLINE"; console.error(e); }
         }
 
         function drawMap(points) {
             const svg = document.getElementById('china-svg');
-    // 去掉了获取 outline 的那两行
-            let content = '';  
+            if (!svg) return;
+            let content = ''; 
             points.forEach((pt) => {
-        // 视觉圆点
-            content += `<circle class="map-dot" cx="${pt.x}" cy="${pt.y}" r="10" pointer-events="none">
-                <animate attributeName="r" values="9;13;9" dur="2.5s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite" />
-            </circle>`;
-        // 强力点击域
-            content += `<circle cx="${pt.x}" cy="${pt.y}" r="30" fill="transparent" style="cursor:pointer" 
-                onclick="showNote('${pt.note}', this.previousSibling)">
-            </circle>`;
-        });
-        svg.innerHTML = content;
-},
+                // 星点视觉
+                content += `<circle class="map-dot" cx="${pt.x}" cy="${pt.y}" r="10" pointer-events="none">
+                    <animate attributeName="r" values="9;13;9" dur="2.5s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite" />
+                </circle>`;
+                // 30px 隐形点击力场
+                content += `<circle cx="${pt.x}" cy="${pt.y}" r="30" fill="transparent" style="cursor:pointer" onclick="showNote('${pt.note}', this.previousSibling)"></circle>`;
+            });
+            svg.innerHTML = content;
+        }
+
+        window.showNote = (note, el) => {
+            if (navigator.vibrate) navigator.vibrate(15); 
+            document.querySelectorAll('.map-dot').forEach(d => d.classList.remove('active'));
+            if (el) el.classList.add('active');
+            document.getElementById('map-note').innerHTML = `<span class="highlight">LOCATE</span> <br> ${note}`;
+        };
 
         function initStars() {
             const container = document.getElementById('fuel-nebula');
