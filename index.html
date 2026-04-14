@@ -102,27 +102,45 @@
                 document.getElementById('sync-status').innerText = "STATUS: OFFLINE";
             }
         }
-
         function renderFuelNebula() {
             const container = document.getElementById('fuel-nebula');
             if(!container || remoteBooks.length === 0) return;
             container.innerHTML = '';
             
             const count = remoteBooks.length;
+            const starColors = ['#7dbdbd', '#9b84b3', '#d1d1d1', '#5c9cd9', '#e0e0e0'];
+
             remoteBooks.forEach((book, i) => {
                 const item = document.createElement('div');
                 item.className = 'star-item';
                 item.innerText = book.title;
                 
-                // 多色分配
-                const color = starColors[i % starColors.length];
-                item.style.color = color;
-                item.style.textShadow = `0 0 8px ${color}`;
+                // --- 核心修改：根据权重(uniqueness)决定颜色与层次 ---
+                let color;
+                let shadowColor;
+                const weight = book.uniqueness || 5;
                 
-                // 字体缩小 (基数 0.5rem + 权重增量)
-                item.style.fontSize = `${0.5 + (book.uniqueness || 5)/30}rem`;
+                if (weight >= 15) {
+                    color = "#ffffff"; // 高权重纯白
+                    shadowColor = "rgba(255, 255, 255, 0.9)";
+                    item.style.zIndex = "100";
+                } else if (weight >= 10) {
+                    color = "#e0f7fa"; // 中权重亮青
+                    shadowColor = "#7dbdbd";
+                    item.style.zIndex = "50";
+                } else {
+                    color = starColors[i % starColors.length]; // 普通权重循环色
+                    shadowColor = color;
+                    item.style.zIndex = "1";
+                }
 
-                // 3D 黄金分割球体算法
+                item.style.color = color;
+                item.style.textShadow = `0 0 10px ${shadowColor}`;
+                
+                // 字体缩放逻辑保持一致
+                item.style.fontSize = `${0.5 + weight/30}rem`;
+
+                // 3D 黄金分割球体坐标算法
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
                 const radius = 135; 
