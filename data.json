@@ -1,19 +1,42 @@
 {
   "panels": [
     {
-      "content": "> 观测点已建立...<br>> 维度：11D<br>> <span class='highlight'>诞生日：2026-01-23</span><br>> 核心频率稳定。这是一片属于 KC 的静谧空间，记录着每一个向内探索的时刻。"
+      "title": "诞生日",
+      "content": "偶然或者注定，奇迹从此萌芽......"
     },
     {
-      "content": "FUEL_NEBULA_RESERVED"
+      "title": "旋转燃料简介",
+      "content": "每一个文字都是一颗燃烧的星"
     },
     {
-      "content": "> 光影采样中...<br>> 镜头：Pixel 6 Pro<br>> <span class='highlight'>照亮空间</span><br>> 捕获了颐和园的残雪与西湖的微雨。每一张相片都是宇宙的一处锚点。"
+      "title": "照亮空间",
+      "content": "丈量每一处，路或者心。",
+      "footprints": [
+        {
+          "city": "杭州",
+          "x": 845,
+          "y": 555,
+          "note": "西湖的风，富春的水。这里是足迹的开始。"
+        },
+        {
+          "city": "北京",
+          "x": 785,
+          "y": 305,
+          "note": "红墙白雪颐和园，皇城根下的冬日记忆。"
+        },
+        {
+          "city": "成都",
+          "x": 500,
+          "y": 400,
+          "note": "修改 x 和 y 坐标（0-1000 范围）可以调整点的位置。"
+        }
+      ]
     },
     {
-      "content": "> 逻辑重构中...<br>> 状态：<span class='highlight'>终极进化</span><br>> 正在学习 Python 自动化与钢琴和弦。代码与音符在虚空中交织，构建更完整的自我。"
+      "title": "终极进化",
+      "content": "蓦然回首，恍若隔世，这里就是唯一的留恋..."
     }
-  ],
-  
+  ],  
   "readBooks": [
     { "title": "三体", "uniqueness": 20 },
     { "title": "基地", "uniqueness": 12 },
