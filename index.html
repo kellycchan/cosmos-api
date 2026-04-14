@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KC小宇宙-物理驱动版</title>
+    <title>KC小宇宙-绚丽星空版</title>
     <style>
         :root { --color-0: #5c9cd9; --color-1: #7dbdbd; --color-2: #9b84b3; --color-3: #d1d1d1; --bg-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,11 +21,8 @@
         .display-screen { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(20px); padding: 30px 20px; height: 100%; width: 100%; position: relative; clip-path: polygon(8% 0%, 100% 5%, 100% 95%, 92% 100%, 0% 95%, 0% 8%); border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
         .content-panel { display: none; height: 100%; overflow-y: auto; scrollbar-width: none; line-height: 2.2; font-size: 0.9rem; color: #ccc; }
         .content-panel.active { display: block; }
-
-        /* 旋转容器：取消所有 CSS 动画，改为静态居中 */
         #fuel-nebula { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform-style: preserve-3d; }
-        .star-item { position: absolute; cursor: pointer; font-weight: bold; white-space: nowrap; transition: color 0.4s, text-shadow 0.4s; will-change: transform, opacity; }
-
+        .star-item { position: absolute; cursor: pointer; font-weight: bold; white-space: nowrap; transition: color 0.4s, text-shadow 0.4s; will-change: transform, opacity; transform-origin: center; }
         footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.4rem; opacity: 0.2; }
     </style>
 </head>
@@ -51,16 +48,15 @@
             </div>
         </main>
     </div>
-    <footer>V15.5 ENGINE_DRIVEN</footer>
+    <footer>V15.6 SPECTRUM_ENGINE</footer>
 
     <script>
         const getUrl = () => "https://raw.githubusercontent.com/kellycchan/cosmos-api/main/data.json?v=" + Date.now();
         const colors = ['#5c9cd9', '#7dbdbd', '#9b84b3', '#d1d1d1'];
-        const starColors = ['#7dbdbd', '#9b84b3', '#d1d1d1', '#5c9cd9', '#e0e0e0'];
+        // 扩展调色盘：加入黄、红、橙
+        const starColors = ['#ffcc80', '#ff8a80', '#7dbdbd', '#9b84b3', '#d1d1d1', '#ffd54f', '#ff5252'];
         let remoteBooks = [];
         let stars = [];
-        let angleX = 0;
-        let angleY = 0;
 
         async function fetchCosmosData() {
             const statusTag = document.getElementById('sync-status');
@@ -90,23 +86,27 @@
                 item.innerText = book.title;
                 const weight = book.uniqueness || 5;
                 
-                // 颜色和字号
-                let color = (weight >= 15) ? "#ffffff" : (weight >= 10 ? "#e0f7fa" : starColors[i % starColors.length]);
+                // 颜色逻辑增强
+                let color;
+                if (weight >= 18) { color = "#ffffff"; } // 顶级权重：纯白
+                else if (weight >= 14) { color = "#ffd54f"; } // 高权重：琥珀黄
+                else if (weight >= 10) { color = "#ff5252"; } // 中高权重：珊瑚红
+                else { color = starColors[i % starColors.length]; } // 其他随机
+
                 item.style.color = color;
                 item.style.textShadow = `0 0 ${8+weight/2}px ${color}`;
                 item.style.fontSize = `${0.5 + weight/40}rem`;
 
-                // 初始球体分布
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                const radius = 150;
+                const radius = 160; // 稍微拉大半径
 
                 stars.push({
                     el: item,
                     x: radius * Math.sin(phi) * Math.cos(theta),
                     y: radius * Math.sin(phi) * Math.sin(theta),
                     z: radius * Math.cos(phi),
-                    speed: (0.005 + weight / 1000) // 权重关联能量
+                    speed: (0.006 + weight / 1200)
                 });
                 container.appendChild(item);
             });
@@ -114,7 +114,6 @@
 
         function animate() {
             stars.forEach(s => {
-                // 绕 Y 轴旋转
                 const cos = Math.cos(s.speed);
                 const sin = Math.sin(s.speed);
                 const x1 = s.x * cos - s.z * sin;
@@ -122,12 +121,11 @@
                 s.x = x1;
                 s.z = z1;
 
-                // 投影到 2D 平面（彻底解决一团的问题）
                 const scale = 1000 / (1000 - s.z);
-                const alpha = (s.z + 150) / 300 + 0.2;
+                const alpha = (s.z + 160) / 320 + 0.2;
                 s.el.style.transform = `translate3d(${s.x * scale}px, ${s.y * scale}px, 0) scale(${scale})`;
                 s.el.style.opacity = alpha;
-                s.el.style.zIndex = Math.floor(s.z + 150);
+                s.el.style.zIndex = Math.floor(s.z + 160);
             });
             requestAnimationFrame(animate);
         }
@@ -139,7 +137,6 @@
             if(index === 1) initStars();
         }
 
-        // 下拉刷新
         let startY = 0;
         document.getElementById('touch-area').addEventListener('touchstart', (e) => startY = e.touches[0].pageY);
         document.getElementById('touch-area').addEventListener('touchend', (e) => {
