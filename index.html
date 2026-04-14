@@ -74,39 +74,50 @@
                 statusTag.innerText = "STATUS: SYNC_STABLE";
             } catch (e) { statusTag.innerText = "STATUS: OFFLINE"; }
         }
-
-        function initStars() {
+      function initStars() {
             const container = document.getElementById('fuel-nebula');
             container.innerHTML = '';
             stars = [];
-            const count = remoteBooks.length;
-            remoteBooks.forEach((book, i) => {
+            
+            // 为了保证手机性能，如果超过 120 本则截断，防止渲染压力过大导致发烫
+            const displayList = remoteBooks.slice(0, 120); 
+            const count = displayList.length;
+
+            displayList.forEach((book, i) => {
                 const item = document.createElement('div');
                 item.className = 'star-item';
                 item.innerText = book.title;
                 const weight = book.uniqueness || 5;
                 
-                // 颜色逻辑增强
+                /* * [权重光谱参考]
+                 * 18-20: #ffffff (纯白) - 核心恒星，极速
+                 * 14-17: #ffd54f (琥珀黄) - 活跃行星，快速
+                 * 10-13: #ff5252 (珊瑚红) - 焦点星体，中速
+                 * 01-09: starColors (冷色系) - 基础星尘，慢速
+                 */
                 let color;
-                if (weight >= 18) { color = "#ffffff"; } // 顶级权重：纯白
-                else if (weight >= 14) { color = "#ffd54f"; } // 高权重：琥珀黄
-                else if (weight >= 10) { color = "#ff5252"; } // 中高权重：珊瑚红
-                else { color = starColors[i % starColors.length]; } // 其他随机
+                if (weight >= 18) { color = "#ffffff"; } 
+                else if (weight >= 14) { color = "#ffd54f"; } 
+                else if (weight >= 10) { color = "#ff5252"; } 
+                else { color = starColors[i % starColors.length]; }
 
                 item.style.color = color;
-                item.style.textShadow = `0 0 ${8+weight/2}px ${color}`;
-                item.style.fontSize = `${0.5 + weight/40}rem`;
+                // 优化后的发光逻辑：权重越高，光晕越柔和分散
+                item.style.textShadow = `0 0 ${6 + weight/3}px ${color}`;
+                item.style.fontSize = `${0.45 + weight/45}rem`;
 
+                // 物理分布算法
                 const phi = Math.acos(-1 + (2 * i) / count);
                 const theta = Math.sqrt(count * Math.PI) * phi;
-                const radius = 160; // 稍微拉大半径
+                const radius = 160; 
 
                 stars.push({
                     el: item,
                     x: radius * Math.sin(phi) * Math.cos(theta),
                     y: radius * Math.sin(phi) * Math.sin(theta),
                     z: radius * Math.cos(phi),
-                    speed: (0.006 + weight / 1200)
+                    // 能量关联速度公式：(0.006 为基准，权重每加 1 提升 0.0008 的动能)
+                    speed: (0.006 + weight / 1250)
                 });
                 container.appendChild(item);
             });
