@@ -55,47 +55,69 @@
             } catch (e) { statusTag.innerText = "OFFLINE"; }
         }
 
-        function initStars() {
-            const container = document.getElementById('fuel-nebula'); container.innerHTML = ''; stars = [];
-            const count = remoteBooks.length;
-            const r = Math.max(window.innerWidth, window.innerHeight) * 0.45;
-            
-            remoteBooks.forEach((book, i) => {
-                const el = document.createElement('div'); el.className = 'star-item'; el.innerText = book.title;
-                let val = String(book.uniqueness).replace(/[^0-9.]/g, ''); const w = parseFloat(val) || 5;
-                
-                let col;
-                // 低饱和度色彩逻辑
-                if (w >= 20) { col = "hsl(0, 0%, 90%)"; el.style.textShadow = `0 0 ${w/4}px rgba(255,255,255,0.4)`; } 
-                else if (w >= 18) { col = "hsl(40, 40%, 65%)"; el.style.textShadow = `0 0 ${w/5}px rgba(255,200,100,0.2)`; }
-                else if (w >= 10) { col = "hsl(210, 30%, 60%)"; el.style.textShadow = "none"; }
-                else { col = morandiPool[i % morandiPool.length]; el.style.textShadow = "none"; }
+function initStars() {
+    const container = document.getElementById('fuel-nebula');
+    container.innerHTML = ''; stars = [];
+    const count = remoteBooks.length;
+    const r = Math.max(window.innerWidth, window.innerHeight) * 0.45;
+    
+    // 检测是否为移动端，给予速度补偿
+    const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+    const speedBoost = isMobile ? 2.5 : 1.0; 
 
-                el.style.color = col;
-                const lenRatio = book.title.length > 8 ? 0.8 : 1; 
-                el.style.fontSize = `${(0.45 + w/60) * lenRatio}rem`;
-                
-                const phi = Math.acos(-1 + (2 * i) / count); const theta = Math.sqrt(count * Math.PI) * phi;
-                stars.push({
-                    el: el, x: r * Math.sin(phi) * Math.cos(theta), y: r * Math.sin(phi) * Math.sin(theta), z: r * Math.cos(phi),
-                    v: (0.012 + (w * w) / 15000) // 维持超频转速
-                });
-                container.appendChild(el);
-            });
-        }
+    remoteBooks.forEach((book, i) => {
+        const el = document.createElement('div');
+        el.className = 'star-item';
+        el.innerText = book.title;
+        let val = String(book.uniqueness).replace(/[^0-9.]/g, '');
+        const w = parseFloat(val) || 5;
+        
+        // 颜色逻辑保持 V18.2 的莫兰迪高级感
+        let col;
+        if (w >= 20) { col = "hsl(0, 0%, 95%)"; el.style.textShadow = `0 0 ${w/4}px rgba(255,255,255,0.4)`; } 
+        else if (w >= 18) { col = "hsl(40, 45%, 70%)"; }
+        else if (w >= 10) { col = "hsl(210, 30%, 65%)"; }
+        else { col = morandiPool[i % morandiPool.length]; }
 
-        function animate() {
-            stars.forEach(s => {
-                const cos = Math.cos(s.v); const sin = Math.sin(s.v);
-                const x1 = s.x * cos - s.z * sin; const z1 = s.z * cos + s.x * sin;
-                s.x = x1; s.z = z1;
-                const scale = (s.z + 200) / 450 * 0.5 + 0.5; 
-                const opacity = (s.z + 200) / 450 * 0.7 + 0.2; // 远端更暗
-                s.el.style.transform = `translate3d(${s.x}px, ${s.y}px, ${s.z}px) scale(${scale})`;
-                s.el.style.opacity = opacity; s.el.style.zIndex = Math.floor(s.z + 200);
-            });
-            requestAnimationFrame(animate);
-        }
+        el.style.color = col;
+        const lenRatio = book.title.length > 8 ? 0.75 : 1; 
+        el.style.fontSize = `${(0.42 + w/65) * lenRatio}rem`;
+        
+        const phi = Math.acos(-1 + (2 * i) / count);
+        const theta = Math.sqrt(count * Math.PI) * phi;
+        
+        stars.push({
+            el: el,
+            x: r * Math.sin(phi) * Math.cos(theta),
+            y: r * Math.sin(phi) * Math.sin(theta),
+            z: r * Math.cos(phi),
+            // 手机版超频公式：基础值大幅度拉升
+            v: (0.02 + (w * w) / 8000) * speedBoost 
+        });
+        container.appendChild(el);
+    });
+}
+
+function animate() {
+    stars.forEach(s => {
+        // 使用更高效的局部变量减少计算开销
+        const cosV = Math.cos(s.v);
+        const sinV = Math.sin(s.v);
+        const x1 = s.x * cosV - s.z * sinV;
+        const z1 = s.z * cosV + s.x * sinV;
+        s.x = x1; s.z = z1;
+        
+        // 调整缩放感，让手机端更有冲出屏幕的冲击力
+        const scale = (s.z + 200) / 450 * 0.6 + 0.4;
+        const opacity = (s.z + 200) / 450 * 0.7 + 0.2;
+        
+        // 强制开启硬件加速
+        s.el.style.transform = `translate3d(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px, ${s.z.toFixed(1)}px) scale(${scale.toFixed(2)})`;
+        s.el.style.opacity = opacity;
+    });
+    requestAnimationFrame(animate);
+}
+
 
         function switchPanel(idx) {
             document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
